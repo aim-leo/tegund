@@ -23,7 +23,7 @@
     "cm": "npx git-cz",
     "release": "standard-version && npm run push && npm run pub2npm",
     "release:d": "standard-version --dry-run",
-    "push": "git push --follow-tags origin master && git push --follow-tags github master",
+    "push": "git push --follow-tags origin master",
     "pub2npm": "nrm use npm && npm publish",
     "lint": "node_modules/eslint/bin/eslint.js -c ./.eslintrc.js ./src --fix",
     "build": "node_modules/webpack/bin/webpack.js --config webpack.config.js --mode production"

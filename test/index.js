@@ -1,3 +1,5 @@
-const tegund = require('../dist/tegund')
+const { acceptString, refuseString } = require('../dist/tegund')
 
-console.log(tegund)
+refuseString('123')
+acceptString(123)
+acceptString('456')

@@ -3,7 +3,9 @@ const typeLib = require('./type')
 const { whatType, isFunction, isArray, types } = typeLib
 
 function accept(obj, typedFunction, message) {
-  if (!isFunction(typedFunction)) { throw new Error('typedFunction expected a function') }
+  if (!isFunction(typedFunction)) {
+    throw new Error('typedFunction expected a function')
+  }
   const flag = typedFunction(obj)
 
   if (!flag) {
@@ -34,7 +36,9 @@ function acceptArray(objs, typedFunction, message) {
 }
 
 function refuse(obj, typedFunction, message) {
-  if (!isFunction(typedFunction)) { throw new Error('typedFunction expected a function') }
+  if (!isFunction(typedFunction)) {
+    throw new Error('typedFunction expected a function')
+  }
   const flag = typedFunction(obj)
 
   if (flag) {
@@ -64,17 +68,19 @@ function refuseArray(objs, typedFunction, message) {
 const assets = {}
 
 for (const type of types) {
+  const typedFunction = typeLib['is' + type]
+
   assets[`accept${type}`] = (obj, message) =>
-    accept(obj, typeLib[type], message)
+    accept(obj, typedFunction, message)
 
   assets[`accept${type}Array`] = (objs, message) =>
-    acceptArray(objs, typeLib[type], message)
+    acceptArray(objs, typedFunction, message)
+
+  assets[`refuse${type}`] = (objs, message) =>
+    refuse(objs, typedFunction, message)
 
   assets[`refuse${type}Array`] = (objs, message) =>
-    refuse(objs, typeLib[type], message)
-
-  assets[`refuse${type}Array`] = (objs, message) =>
-    refuseArray(objs, typeLib[type], message)
+    refuseArray(objs, typedFunction, message)
 }
 
 module.exports = {
@@ -84,5 +90,5 @@ module.exports = {
   refuse,
   refuseArray,
 
-  ...assets
+  ...assets,
 }
