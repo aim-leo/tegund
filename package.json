@@ -1,0 +1,65 @@
+{
+  "name": "tegund",
+  "version": "1.0.0",
+  "description": "Simple type judgment tool for js",
+  "author": "aimleo",
+  "license": "MIT",
+  "main": "dist/tegund.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "type",
+    "tegund"
+  ],
+  "engines": {
+    "node": ">=10.x",
+    "npm": ">= 6.x"
+  },
+  "browserslist": [
+    "maintained node versions"
+  ],
+  "scripts": {
+    "cm": "npx git-cz",
+    "release": "standard-version && npm run push && npm run pub2npm",
+    "release:d": "standard-version --dry-run",
+    "push": "git push --follow-tags origin master && git push --follow-tags github master",
+    "pub2npm": "nrm use npm && npm publish",
+    "lint": "node_modules/eslint/bin/eslint.js -c ./.eslintrc.js ./src --fix",
+    "build": "node_modules/webpack/bin/webpack.js --config webpack.config.js --mode production"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/node": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-eslint": "^10.0.3",
+    "babel-loader": "^8.0.6",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "standard-version": "^9.0.0",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.6"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}
