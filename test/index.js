@@ -1,5 +1,5 @@
-const { acceptString, refuseString } = require('../dist/tegund')
+const { isFuncArray } = require('../src')
 
-refuseString('123')
-acceptString(123)
-acceptString('456')
+console.log(
+  isFuncArray([1])
+)

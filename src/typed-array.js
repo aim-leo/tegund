@@ -12,7 +12,8 @@ function isTypedArray(obj, typedFunction) {
 const typedArrayValidators = {}
 
 for (const type of types) {
-  typedArrayValidators[`is${type}Array`] = obj => isTypedArray(obj, typeLib[type])
+  const typedFunction = typeLib['is' + type]
+  typedArrayValidators[`is${type}Array`] = obj => isTypedArray(obj, typedFunction)
 }
 
 module.exports = {
