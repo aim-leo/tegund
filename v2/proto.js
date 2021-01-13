@@ -1,6 +1,6 @@
 const { asset, isFunction, getValidateByType } = require('./validate')
 
-class T{
+class T {
   constructor() {
     this._type = new Set()
 
@@ -25,21 +25,27 @@ class T{
     this._validate.push(v)
   }
 
-  check(data) {
-    // check root type
-    let typeValid = false
-    for (const type of this.typeArray) {
-      const typeV = getValidateByType(type)
-      if (isFunction(typeV) && typeV(data)) {
-        typeValid = true
+  check(...datas) {
+    for (const data of datas) {
+      // check root type
+      let typeValid = false
+
+      if (this.typeArray.length == 0) typeValid = true
+
+      for (const type of this.typeArray) {
+        const typeV = getValidateByType(type)
+        if (isFunction(typeV) && typeV(data)) {
+          typeValid = true
+          break
+        }
       }
-    }
 
-    if (!typeValid) return false
+      if (!typeValid) return false
 
-    // check addtional validate
-    for (const v of this._validate) {
-      if (!v(data)) return false
+      // check addtional validate
+      for (const v of this._validate) {
+        if (!v(data)) return false
+      }
     }
 
     return true
@@ -47,7 +53,7 @@ class T{
 }
 
 
-class ObjectT extends T{
+class ObjectT extends T {
   constructor(child) {
     super()
 
@@ -83,7 +89,7 @@ class ObjectT extends T{
   }
 }
 
-class ArrayT extends T{
+class ArrayT extends T {
   constructor(child) {
     super()
 
@@ -135,12 +141,16 @@ class NotAtT extends T {
     this.not(...types)
   }
 
+  get excludeTypeArray() {
+    return Array.from(this._excludeType)
+  }
+
   not(...types) {
     for (let type of types) {
       if (type instanceof T) {
         type = type.typeArray
       }
-      
+
       this._exclude(...type)
     }
   }
@@ -151,6 +161,23 @@ class NotAtT extends T {
 
       this._excludeType.add(item)
     }
+  }
+
+  check(...datas) {
+    const result = super.check(...datas)
+
+    if (!result) return false
+
+    for (const data of datas) {
+      for (const type of this.excludeTypeArray) {
+        const typeV = getValidateByType(type)
+        if (isFunction(typeV) && typeV(data)) {
+          return false
+        }
+      }
+    }
+
+    return true
   }
 }
 

@@ -26,7 +26,9 @@
     "push": "git push --follow-tags origin master",
     "pub2npm": "nrm use npm && npm publish",
     "lint": "node_modules/eslint/bin/eslint.js -c ./.eslintrc.js ./src --fix",
-    "build": "node_modules/webpack/bin/webpack.js --config webpack.config.js --mode production"
+    "build": "node_modules/webpack/bin/webpack.js --config webpack.config.js --mode production",
+    "test:basic": "jest test/basic.test.js",
+    "test:condition": "jest test/condition.test.js"
   },
   "dependencies": {},
   "devDependencies": {
@@ -42,6 +44,7 @@
     "eslint-plugin-node": "^10.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "jest": "^26.6.3",
     "standard-version": "^9.0.0",
     "webpack": "^4.39.2",
     "webpack-cli": "^3.3.6"

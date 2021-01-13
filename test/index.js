@@ -1,29 +1,17 @@
-const {
-  boolean,
-  object,
-  array,
-  string,
-  notat,
-  at,
-  empty,
-  any,
-  never,
-} = require('../v2/type')
+const { at, string, number, notat, any, empty } = require('../v2/type')
 
-console.log(boolean())
-// console.log(
-//   object({
-//     a: boolean(),
-//     b: object(),
-//     c: array(string()),
-//   })
-// )
+console.log(at(string(), number()).check(''))
+console.log(at(string(), number()).check(1))
+console.log(at(string(), number()).check(true))
 
-// console.log(notat(boolean(), string()))
-// console.log(at(boolean(), string()))
-// console.log(any())
-// console.log(empty())
-// console.log(never())
-console.log(boolean().check(1))
+console.log(notat(string(), number()).check(''))
+console.log(notat(string(), number()).check(1))
+console.log(notat(string(), number()).check(true))
 
-console.log(boolean().check(true))
+console.log(any().check(''))
+console.log(any().check(1))
+
+console.log(empty().check(0))
+console.log(empty().check(null))
+console.log(empty().check(undefined))
+console.log(empty().check(''))

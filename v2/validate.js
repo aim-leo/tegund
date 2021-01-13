@@ -46,7 +46,7 @@ function isInteger(...objs) {
 }
 
 function isFloat(...objs) {
-  return isNumber(...objs) && objs.every(obj => obj%1 === 0)
+  return isNumber(...objs) && objs.every(obj => obj%1 !== 0)
 }
 
 function isSymbol(...objs) {
