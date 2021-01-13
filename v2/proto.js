@@ -1,4 +1,4 @@
-const { asset, isFunction } = require('./validate')
+const { asset, isFunction, getValidateByType } = require('./validate')
 
 class T{
   constructor() {
@@ -23,6 +23,26 @@ class T{
     asset(v, 'Function')
 
     this._validate.push(v)
+  }
+
+  check(data) {
+    // check root type
+    let typeValid = false
+    for (const type of this.typeArray) {
+      const typeV = getValidateByType(type)
+      if (isFunction(typeV) && typeV(data)) {
+        typeValid = true
+      }
+    }
+
+    if (!typeValid) return false
+
+    // check addtional validate
+    for (const v of this._validate) {
+      if (!v(data)) return false
+    }
+
+    return true
   }
 }
 
