@@ -1,4 +1,4 @@
-const { asset, isFunction, getValidateByType } = require('./validate')
+const { asset, isFunction, isString, getValidateByType } = require('./validate')
 
 class T {
   constructor() {
@@ -11,12 +11,12 @@ class T {
     return Array.from(this._type)
   }
 
-  type(...t) {
-    for (const item of t) {
-      asset(item, 'String')
+  type(...types) {
+    const result = this._formatTypes(...types)
 
-      this._type.add(item)
-    }
+    result.map(t => this._type.add(t))
+
+    return this
   }
 
   validate(v) {
@@ -49,6 +49,21 @@ class T {
     }
 
     return true
+  }
+
+  _formatTypes(...types) {
+    const result = []
+    for (let type of types) {
+      if (type instanceof T) {
+        type = type.typeArray
+      }
+
+      if (isString(type)) type = [type]
+
+      result.push(...type)
+    }
+
+    return result
   }
 }
 
@@ -113,25 +128,6 @@ class ArrayT extends T {
   }
 }
 
-class AtT extends T {
-  constructor(...types) {
-    super()
-
-    this._excludeType = new Set()
-
-    this.in(...types)
-  }
-
-  in(...types) {
-    for (let type of types) {
-      if (type instanceof T) {
-        type = type.typeArray
-      }
-      this.type(...type)
-    }
-  }
-}
-
 class NotAtT extends T {
   constructor(...types) {
     super()
@@ -146,21 +142,11 @@ class NotAtT extends T {
   }
 
   not(...types) {
-    for (let type of types) {
-      if (type instanceof T) {
-        type = type.typeArray
-      }
+    const result = this._formatTypes(...types)
 
-      this._exclude(...type)
-    }
-  }
+    result.map(t => this._excludeType.add(t))
 
-  _exclude(...t) {
-    for (const item of t) {
-      asset(item, 'String')
-
-      this._excludeType.add(item)
-    }
+    return this
   }
 
   check(...datas) {
@@ -186,6 +172,5 @@ module.exports = {
   T,
   ObjectT,
   ArrayT,
-  AtT,
   NotAtT
 }
