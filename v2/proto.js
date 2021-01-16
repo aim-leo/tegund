@@ -32,6 +32,8 @@ class T {
   }
 
   check(...datas) {
+    if (datas.length === 0) return false
+    
     for (const data of datas) {
       // check root type
       let typeValid = false

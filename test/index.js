@@ -95,9 +95,13 @@ const {
 //   }).check({ a: { b: 1 } })
 // )
 
+// console.log(
+//   at(
+//     string(),
+//     number()
+//   ).check(true)
+// )
+
 console.log(
-  at(
-    string(),
-    number()
-  ).check(true)
+  string().check()
 )
