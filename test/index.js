@@ -1,21 +1,44 @@
-const { at, string, number, notat, any, empty } = require('../v2/type')
+const {
+  at,
+  string,
+  number,
+  notat,
+  any,
+  empty,
+  object,
+  array,
+} = require('../v2/type')
 
-console.log(at(string(), number()))
-console.log(at("String", "Number"))
+// console.log(object().check({}))
+// console.log(object({ a: string(), b: number() }).check({ a: '', b: 1, c: 2 }))
+// console.log(object({ a: object({ b: string() }) }).check({ a: { b: ''} }))
+// console.log(
+//   object({
+//     b: string(),
+//     c: object({
+//       d: number()
+//     })
+//   })
+// )
 
-console.log(notat(string(), number()))
-console.log(notat("String", "Number"))
+// console.log(
+//   object({
+//     b: 'String',
+//     c: object({
+//       d: 'Number'
+//     })
+//   })
+// )
 
-// console.log(at("Undefined").check(undefined))
-// console.log(at("Undefined", "String").check(undefined))
-// console.log(at("Set","Object","Array","Partten","String","SyncFunction","NaN","Promise","Number","Symbol","Date","Boolean","AsyncFunction","Undefined").check(undefined))
-// console.log(notat("Set","Symbol","Undefined","Object","Date","AsyncFunction","SyncFunction","NaN","Boolean").check(new Date()))
-
-
-function a(...args) {
-  console.log(args)
-}
-
-a(1)
-a(1,2,3)
-a([1,2,3])
+console.log(array().check())
+console.log(array(number()).check([1]))
+console.log(array(number()).check([1, '']))
+console.log(array(number(), string()).check([1, '']))
+console.log(
+  array(
+    object({
+      a: string(),
+    })
+  ).check([{ a: '' }])
+)
+// console.log(array(string(), number()).check())

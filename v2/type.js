@@ -27,9 +27,9 @@ const result = {
 for (const type of allTypes) {
   const name = type.toLowerCase()
 
-  result[name] = child => {
+  result[name] = (...child) => {
     const Proto = type === 'Object' ? ObjectT : (type === 'Array' ? ArrayT : T)
-    const t = new Proto(child)
+    const t = new Proto(...child)
 
     t.type(type)
 
