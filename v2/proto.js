@@ -1,4 +1,10 @@
-const { asset, isFunction, isString, getValidateByType, allTypes } = require('./validate')
+const {
+  asset,
+  isFunction,
+  isString,
+  getValidateByType,
+  allTypes,
+} = require('./validate')
 
 class T {
   constructor() {
@@ -12,9 +18,9 @@ class T {
   }
 
   type(...types) {
-    const result = this._formatTypes(...types)
+    const result = this._format2TypeString(...types)
 
-    result.map(t => this._type.add(t))
+    result.map((t) => this._type.add(t))
 
     return this
   }
@@ -51,14 +57,12 @@ class T {
     return true
   }
 
-  _formatTypes(...types) {
+  _format2TypeString(...types) {
     const result = []
     for (let type of types) {
       if (type instanceof T) {
         type = type.typeArray
-      }
-
-      if (allTypes.includes(type)) {
+      } else if (isString(type) && allTypes.includes(type)) {
         type = [type]
       } else {
         continue
@@ -69,8 +73,24 @@ class T {
 
     return result
   }
-}
 
+  _format2Type(...types) {
+    const result = []
+    for (let type of types) {
+      if (type instanceof T) {
+        result.push(type)
+      } else if (isString(type) && allTypes.includes(type)) {
+        const t = new T()
+
+        t.type(type)
+
+        result.push(t)
+      }
+    }
+
+    return result
+  }
+}
 
 class ObjectT extends T {
   constructor(child) {
@@ -149,7 +169,7 @@ class ArrayT extends T {
       }
 
       if (child === undefined) continue
-  
+
       const t = new T()
       t.type(child)
 
@@ -180,23 +200,19 @@ class ArrayT extends T {
   }
 }
 
-class NotAtT extends T {
+class AtT extends T {
   constructor(...types) {
     super()
 
-    this._excludeType = new Set()
+    this._maybeCondition = []
 
-    this.not(...types)
+    this.or(...types)
   }
 
-  get excludeTypeArray() {
-    return Array.from(this._excludeType)
-  }
+  or(...types) {
+    const result = this._format2Type(...types)
 
-  not(...types) {
-    const result = this._formatTypes(...types)
-
-    result.map(t => this._excludeType.add(t))
+    result.map((t) => this._maybeCondition.push(t))
 
     return this
   }
@@ -207,9 +223,42 @@ class NotAtT extends T {
     if (!result) return false
 
     for (const data of datas) {
-      for (const type of this.excludeTypeArray) {
-        const typeV = getValidateByType(type)
-        if (isFunction(typeV) && typeV(data)) {
+      for (const type of this._maybeCondition) {
+        if (type.check(data)) {
+          return true
+        }
+      }
+    }
+
+    return false
+  }
+}
+
+class NotAtT extends T {
+  constructor(...types) {
+    super()
+
+    this._excludeCondition = []
+
+    this.not(...types)
+  }
+
+  not(...types) {
+    const result = this._format2Type(...types)
+
+    result.map((t) => this._excludeCondition.push(t))
+
+    return this
+  }
+
+  check(...datas) {
+    const result = super.check(...datas)
+
+    if (!result) return false
+
+    for (const data of datas) {
+      for (const type of this._excludeCondition) {
+        if (type.check(data)) {
           return false
         }
       }
@@ -219,10 +268,10 @@ class NotAtT extends T {
   }
 }
 
-
 module.exports = {
   T,
   ObjectT,
   ArrayT,
-  NotAtT
+  NotAtT,
+  AtT
 }

@@ -2,10 +2,10 @@ const {
   allTypes, isEmpty, isUndefined
 } = require('./validate')
 
-const { T, ObjectT, ArrayT, NotAtT } = require('./proto')
+const { T, ObjectT, ArrayT, NotAtT, AtT } = require('./proto')
 
 const result = {
-  at: (...types) => (new T()).type(...types),
+  at: (...types) => new AtT(...types),
   notat: (...types) => new NotAtT(...types),
   any: () => new T(),
   empty: () => {

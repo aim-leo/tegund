@@ -30,15 +30,74 @@ const {
 //   })
 // )
 
-console.log(array().check())
-console.log(array(number()).check([1]))
-console.log(array(number()).check([1, '']))
-console.log(array(number(), string()).check([1, '']))
+// console.log(array().check())
+// console.log(array(number()).check([1]))
+// console.log(array(number()).check([1, '']))
+// console.log(array(number(), string()).check([1, '']))
+// console.log(
+//   array(
+//     object({
+//       a: string(),
+//     })
+//   ).check([{ a: '' }])
+// )
+// console.log(
+//   object({
+//     a: notat('String')
+//   }).check({ a: '' })
+// )
+// // console.log(
+// //   object({
+// //     a: notat(
+// //       object({
+// //         b: 'String'
+// //       })
+// //     )
+// //   }).check({ a: { b: 1 } })
+// // )
+// // console.log(array(string(), number()).check())
+
+
+// console.log(
+//   object({
+//     a: string()
+//   }).check({
+//     a: 1
+//   })
+// )
+
+// console.log(
+//   notat(
+//     string(),
+//     number()
+//   ).check(undefined)
+// )
+
+// console.log(
+//   notat(
+//     object(
+//       {
+//         a: object()
+//       }
+//     )
+//   ).check({
+//     a: 1
+//   })
+// )
+
+// console.log(
+//   object({
+//     a: notat(
+//       object({
+//         b: 'Number'
+//       })
+//     )
+//   }).check({ a: { b: 1 } })
+// )
+
 console.log(
-  array(
-    object({
-      a: string(),
-    })
-  ).check([{ a: '' }])
+  at(
+    string(),
+    number()
+  ).check(true)
 )
-// console.log(array(string(), number()).check())
