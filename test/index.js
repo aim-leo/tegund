@@ -9,7 +9,9 @@ const {
   array,
 } = require('../v2/type')
 
-// console.log(object().check({}))
+console.log(string().inspect(1))
+console.log(object({ a: string() }).inspect({ a: 2 }))
+console.log(at(string(), number()).inspect(true))
 // console.log(object({ a: string(), b: number() }).check({ a: '', b: 1, c: 2 }))
 // console.log(object({ a: object({ b: string() }) }).check({ a: { b: ''} }))
 // console.log(
@@ -102,6 +104,11 @@ const {
 //   ).check(true)
 // )
 
-console.log(
-  string().check()
-)
+// console.log(
+//   string().check()
+// )
+
+// const Validator = require("fastest-validator");
+ 
+// const v = new Validator()
+

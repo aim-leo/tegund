@@ -1,3 +1,4 @@
+const { ValidateTypeError, ValidateError } = require('./error')
 const {
   asset,
   isFunction,
@@ -25,20 +26,30 @@ class T {
     return this
   }
 
-  validate(v) {
-    asset(v, 'Function')
+  validate(validator, message) {
+    asset(validator, 'Function')
+    asset(message, 'String')
 
-    this._validate.push(v)
+    this._validate.push({
+      validator,
+      message,
+    })
   }
 
-  check(...datas) {
-    if (datas.length === 0) return false
-    
-    for (const data of datas) {
-      // check root type
+  // return a object like { pass: false, message: 'not a valid string' }
+  inspect(...datas) {
+    if (datas.length === 0)
+      return new ValidateError({
+        message: `None is not a valid type at ${this.typeArray}`,
+      })
+    for (const index in datas) {
+      const data = datas[index]
+      // inspect root type
       let typeValid = false
 
-      if (this.typeArray.length == 0) typeValid = true
+      if (this.typeArray.length === 0) {
+        typeValid = true
+      }
 
       for (const type of this.typeArray) {
         const typeV = getValidateByType(type)
@@ -48,12 +59,26 @@ class T {
         }
       }
 
-      if (!typeValid) return false
-
-      // check addtional validate
-      for (const v of this._validate) {
-        if (!v(data)) return false
+      if (!typeValid) {
+        return new ValidateTypeError({
+          source: data,
+          index,
+          type: this.typeArray,
+        })
       }
+
+      // inspect addtional validate
+      for (const v of this._validate) {
+        if (!v.validator(data)) return new ValidateError({ message: v.message })
+      }
+    }
+  }
+
+  check(...datas) {
+    const error = this.inspect(...datas)
+
+    if (error instanceof ValidateError) {
+      return false
     }
 
     return true
@@ -91,6 +116,59 @@ class T {
     }
 
     return result
+  }
+}
+
+class AtT extends T {
+  constructor(...types) {
+    super()
+
+    this._maybeCondition = []
+    this._isReverse = false
+
+    this.or(...types)
+  }
+
+  or(...types) {
+    const result = this._format2Type(...types)
+
+    result.map((t) => this._maybeCondition.push(t))
+
+    return this
+  }
+
+  inspect(...datas) {
+    const result = super.inspect(...datas)
+
+    if (result) return result
+
+    const pass = (data) => {
+      for (const type of this._maybeCondition) {
+        const e = type.inspect(data)
+
+        if (!e) {
+          return true
+        }
+      }
+    }
+
+    for (const data of datas) {
+      if (!this._isReverse && !pass(data)) {
+        return new ValidateError()
+      }
+
+      if (this._isReverse && pass(data)) {
+        return new ValidateError()
+      }
+    }
+  }
+}
+
+class NotAtT extends AtT {
+  constructor(...args) {
+    super(...args)
+
+    this._isReverse = true
   }
 }
 
@@ -132,24 +210,29 @@ class ObjectT extends T {
     this._child = result
   }
 
-  check(...datas) {
-    const result = super.check(...datas)
+  inspect(...datas) {
+    const result = super.inspect(...datas)
 
-    if (!result) return false
+    if (result) return result
 
-    // check childs
-    for (const data of datas) {
+    // inspect childs
+    for (const index in datas) {
+      const data = datas[index]
       for (const childKey in this._child) {
         const value = data[childKey]
         const t = this._child[childKey]
 
-        if (!t.check(value)) {
-          return false
+        const e = t.inspect(value)
+        if (e) {
+          return new ValidateError({
+            ...e,
+            message: `${
+              datas.length > 1 ? 'Index:' + index + ',' : ''
+            }field ${childKey} is validate error, ${e.message}`,
+          })
         }
       }
     }
-
-    return true
   }
 }
 
@@ -157,116 +240,32 @@ class ArrayT extends T {
   constructor(...childs) {
     super()
 
-    this._child = []
+    this._child = null
 
     if (childs.length > 0) this.setChild(...childs)
   }
 
   setChild(...childs) {
-    // if the first argument is a array
-    for (const child of childs) {
-      if (child instanceof T) {
-        this._child.push(child)
-        continue
-      }
-
-      if (child === undefined) continue
-
-      const t = new T()
-      t.type(child)
-
-      this._child.push(t)
-    }
+    this._child = new AtT(...childs)
   }
 
-  check(...datas) {
-    const result = super.check(...datas)
+  inspect(...datas) {
+    const result = super.inspect(...datas)
 
-    if (!result) return false
+    if (result) return result
 
-    const atChild = (data) => {
-      if (this._child.length === 0) return true
-      for (const child of this._child) {
-        if (child.check(data)) return true
+    if (!this._child) return 
+
+    // inspect childs
+    for (const index of datas) {
+      const data = datas[index]
+
+      const e = this._child.inspect(...data)
+
+      if (e) {
+        return e
       }
     }
-
-    // check childs
-    for (const data of datas) {
-      for (const item of data) {
-        if (!atChild(item)) return false
-      }
-    }
-
-    return true
-  }
-}
-
-class AtT extends T {
-  constructor(...types) {
-    super()
-
-    this._maybeCondition = []
-
-    this.or(...types)
-  }
-
-  or(...types) {
-    const result = this._format2Type(...types)
-
-    result.map((t) => this._maybeCondition.push(t))
-
-    return this
-  }
-
-  check(...datas) {
-    const result = super.check(...datas)
-
-    if (!result) return false
-
-    for (const data of datas) {
-      for (const type of this._maybeCondition) {
-        if (type.check(data)) {
-          return true
-        }
-      }
-    }
-
-    return false
-  }
-}
-
-class NotAtT extends T {
-  constructor(...types) {
-    super()
-
-    this._excludeCondition = []
-
-    this.not(...types)
-  }
-
-  not(...types) {
-    const result = this._format2Type(...types)
-
-    result.map((t) => this._excludeCondition.push(t))
-
-    return this
-  }
-
-  check(...datas) {
-    const result = super.check(...datas)
-
-    if (!result) return false
-
-    for (const data of datas) {
-      for (const type of this._excludeCondition) {
-        if (type.check(data)) {
-          return false
-        }
-      }
-    }
-
-    return true
   }
 }
 
@@ -275,5 +274,5 @@ module.exports = {
   ObjectT,
   ArrayT,
   NotAtT,
-  AtT
+  AtT,
 }
