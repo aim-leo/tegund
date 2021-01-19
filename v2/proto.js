@@ -26,6 +26,41 @@ class T {
     return this
   }
 
+  length(length) {
+    asset(length, 'Integer', 'length expected a integer')
+    asset(length, val => val > 0, 'length expected a integer gte then 0')
+
+    this._length = length
+
+    return this
+  }
+
+  min(min) {
+    asset(min, 'Integer', 'min expected a integer')
+    asset(min, val => val > 0, 'min expected a integer gte then 0')
+
+    if (this._max) {
+      asset(min, val => val <= this._max, `min expected a integer lte then max: ${this._max}`)
+    }
+
+    this._min = min
+
+    return this
+  }
+
+  max(max) {
+    asset(max, 'Integer', 'max expected a integer')
+    asset(max, val => val > 0, 'max expected a integer gte then 0')
+
+    if (this._min) {
+      asset(max, val => val >= this._min, `min expected a integer lte then max: ${this._min}`)
+    }
+
+    this._max = max
+
+    return this
+  }
+
   validate(validator, message) {
     asset(validator, 'Function')
     asset(message, 'String')

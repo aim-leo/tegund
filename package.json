@@ -28,7 +28,8 @@
     "lint": "node_modules/eslint/bin/eslint.js -c ./.eslintrc.js ./src --fix",
     "build": "node_modules/webpack/bin/webpack.js --config webpack.config.js --mode production",
     "test:basic": "jest test/basic.test.js",
-    "test:condition": "jest test/condition.test.js"
+    "test:condition": "jest test/condition.test.js",
+    "test:range": "jest test/range.test.js"
   },
   "dependencies": {},
   "devDependencies": {
