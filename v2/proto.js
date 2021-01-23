@@ -9,19 +9,15 @@ const {
 
 class T {
   constructor() {
-    this._type = new Set()
+    this._type = null
 
     this._validate = []
   }
 
-  get typeArray() {
-    return Array.from(this._type)
-  }
+  type(type) {
+    const result = this._format2TypeString(type)
 
-  type(...types) {
-    const result = this._format2TypeString(...types)
-
-    result.map((t) => this._type.add(t))
+    this._type = result
 
     return this
   }
@@ -75,22 +71,19 @@ class T {
   inspect(...datas) {
     if (datas.length === 0)
       return new ValidateError({
-        message: `None is not a valid type at ${this.typeArray}`,
+        message: `None is not a ${this._type} type`,
       })
     for (const index in datas) {
       const data = datas[index]
       // inspect root type
       let typeValid = false
 
-      if (this.typeArray.length === 0) {
+      if (!this._type) {
         typeValid = true
-      }
-
-      for (const type of this.typeArray) {
-        const typeV = getValidateByType(type)
+      } else {
+        const typeV = getValidateByType(this._type)
         if (isFunction(typeV) && typeV(data)) {
           typeValid = true
-          break
         }
       }
 
@@ -98,9 +91,11 @@ class T {
         return new ValidateTypeError({
           source: data,
           index,
-          type: this.typeArray,
+          type: this._type,
         })
       }
+
+      // validate length
 
       // inspect addtional validate
       for (const v of this._validate) {
@@ -119,21 +114,12 @@ class T {
     return true
   }
 
-  _format2TypeString(...types) {
-    const result = []
-    for (let type of types) {
-      if (type instanceof T) {
-        type = type.typeArray
-      } else if (isString(type) && allTypes.includes(type)) {
-        type = [type]
-      } else {
-        continue
-      }
-
-      result.push(...type)
+  _format2TypeString(type) {
+    if (type instanceof T) {
+      return type._type
+    } else if (isString(type) && allTypes.includes(type)) {
+      return type
     }
-
-    return result
   }
 
   _format2Type(...types) {

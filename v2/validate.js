@@ -153,7 +153,10 @@ const allValidates = {
 }
 
 function getValidateByType(type) {
-  if (!isString(type)) throw new Error('type expected a string')
+  if (!isString(type)) {
+    console.error('getValidateByType', type)
+    throw new Error('type expected a string')
+  }
 
   return allValidates['is' + type]
 }

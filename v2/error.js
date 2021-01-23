@@ -19,7 +19,7 @@ class ValidateTypeError extends ValidateError {
 
     this.type = type
     this.name = 'ValidateTypeError'
-    this.message = `${field ? field + 'is' : ''}expected a type at ${type}, got a ${whatType(this.source)}`
+    this.message = `${field ? field + 'is' : ''}expected a ${type} type, got a ${whatType(this.source)}`
   }
 }
 
