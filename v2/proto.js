@@ -1,5 +1,5 @@
 const { ValidateTypeError, ValidateError } = require('./error')
-const { rangeValidateMixin } = require('./mixin')
+const { rangeMixin, enumMixin } = require('./mixin')
 const {
   asset,
   isFunction,
@@ -11,6 +11,8 @@ const {
 
 class T {
   constructor() {
+    Object.assign(this, enumMixin)
+
     this._type = null
 
     this._validate = []
@@ -22,7 +24,7 @@ class T {
     this._type = result
 
     if (['String', 'Array'].includes(this._type)) {
-      Object.assign(this, rangeValidateMixin)
+      Object.assign(this, rangeMixin)
     }
 
     return this

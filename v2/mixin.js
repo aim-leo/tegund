@@ -1,8 +1,8 @@
 const { ValidateError } = require('./error')
 
-const { asset } = require('./validate')
+const { asset, isFunction } = require('./validate')
 
-const rangeValidateMixin = {
+const rangeMixin = {
   length(length) {
     if (this._length !== undefined) {
       throw new Error('Can not reset length prop')
@@ -92,6 +92,38 @@ const rangeValidateMixin = {
   },
 }
 
+const enumMixin = {
+  enum(arr) {
+    if (this._leng_enumth !== undefined) {
+      throw new Error('Can not reset enum prop')
+    }
+    asset(arr, 'Array', 'enum expected a array')
+
+    // validate enum value
+    if (isFunction(this.check)) {
+      const err = this.inspect(...arr)
+
+      if (err) throw err
+    }
+
+    this._enum = arr
+
+    this.validate(this._validateEnum.bind(this))
+
+    return this
+  },
+  _validateEnum(data) {
+    if (this._enum === undefined) return
+
+    if (!this._enum.includes(data)) {
+      return new ValidateError({
+        message: `expected a data value at ${this._enum}, but got a ${data}`,
+      })
+    }
+  },
+}
+
 module.exports = {
-  rangeValidateMixin,
+  rangeMixin,
+  enumMixin,
 }
