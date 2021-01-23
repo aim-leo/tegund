@@ -1,10 +1,12 @@
 const { ValidateTypeError, ValidateError } = require('./error')
+const { rangeValidateMixin } = require('./mixin')
 const {
   asset,
   isFunction,
   isString,
   getValidateByType,
   allTypes,
+  isBoolean,
 } = require('./validate')
 
 class T {
@@ -19,47 +21,16 @@ class T {
 
     this._type = result
 
-    return this
-  }
-
-  length(length) {
-    asset(length, 'Integer', 'length expected a integer')
-    asset(length, val => val > 0, 'length expected a integer gte then 0')
-
-    this._length = length
-
-    return this
-  }
-
-  min(min) {
-    asset(min, 'Integer', 'min expected a integer')
-    asset(min, val => val > 0, 'min expected a integer gte then 0')
-
-    if (this._max) {
-      asset(min, val => val <= this._max, `min expected a integer lte then max: ${this._max}`)
+    if (['String', 'Array'].includes(this._type)) {
+      Object.assign(this, rangeValidateMixin)
     }
-
-    this._min = min
-
-    return this
-  }
-
-  max(max) {
-    asset(max, 'Integer', 'max expected a integer')
-    asset(max, val => val > 0, 'max expected a integer gte then 0')
-
-    if (this._min) {
-      asset(max, val => val >= this._min, `min expected a integer lte then max: ${this._min}`)
-    }
-
-    this._max = max
 
     return this
   }
 
   validate(validator, message) {
     asset(validator, 'Function')
-    asset(message, 'String')
+    if (message) asset(message, 'String')
 
     this._validate.push({
       validator,
@@ -69,10 +40,11 @@ class T {
 
   // return a object like { pass: false, message: 'not a valid string' }
   inspect(...datas) {
-    if (datas.length === 0)
+    if (datas.length === 0) {
       return new ValidateError({
         message: `None is not a ${this._type} type`,
       })
+    }
     for (const index in datas) {
       const data = datas[index]
       // inspect root type
@@ -95,11 +67,11 @@ class T {
         })
       }
 
-      // validate length
-
       // inspect addtional validate
       for (const v of this._validate) {
-        if (!v.validator(data)) return new ValidateError({ message: v.message })
+        const res = v.validator(data)
+        if (res instanceof ValidateError) return res
+        if (res === false) return new ValidateError({ message: v.message })
       }
     }
   }

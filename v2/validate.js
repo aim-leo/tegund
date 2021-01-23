@@ -173,18 +173,18 @@ function getValidateType(validate) {
 
 function asset(obj, validate, message) {
   if (isString(validate)) {
-    validate = getValidateByType(validate)
-  }
-  if (!isFunction(validate)) {
-    throw new Error('validate expected a function')
-  }
-  const flag = validate(obj)
+    const v = getValidateByType(validate)
 
-  if (!flag) {
-    throw new Error(
-      message ||
-        `obj expected a ${getValidateType(validate)} type, but got a ${whatType(obj)}`
-    )
+    if (!v(obj)) {
+      throw new Error(
+        message ||
+          `obj expected a ${validate} type, but got a ${whatType(obj)}`
+      )
+    }
+  } else if (isFunction(validate)) {
+    if (!validate(obj)) {
+      throw new Error(message || 'validate error')
+    }
   }
 }
 
