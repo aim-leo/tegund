@@ -7,6 +7,7 @@ const {
   empty,
   object,
   array,
+  never
 } = require('../v2/type')
 
 // console.log(string().length(1).test('222'))
@@ -14,12 +15,15 @@ const {
 // console.log(number().length(1).test('222'))
 // console.log(string().partten(/abc/).optional(true).test(undefined))
 
+
 console.log(
   object({
     a: string(),
-    b: number().optional()
+    b: number().optional(),
+    c: never()
   }).test({
-    a: ''
+    a: '',
+    c: 1
   })
 )
 

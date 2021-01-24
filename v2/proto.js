@@ -97,7 +97,7 @@ class T {
     return true
   }
 
-  optional(data) {
+  optional(data = true) {
     this._optional = data
 
     return this
@@ -209,9 +209,6 @@ class ObjectT extends T {
 
       const t = new T()
 
-      // // if it was a real data, set validate to equal
-      // // if is a function, set it to validate
-      // t.validate(isFunction(value) ? value : s => s === value)
       t.type(value)
 
       result[key] = t
@@ -231,6 +228,14 @@ class ObjectT extends T {
       for (const childKey in this._child) {
         const value = data[childKey]
         const t = this._child[childKey]
+
+        if (t instanceof NeverT && childKey in data) {
+          return new ValidateError({
+            message: `${
+              datas.length > 1 ? 'Index:' + index + ',' : ''
+            }field ${childKey} is never allow to entered`,
+          })
+        }
 
         const e = t.test(value)
         if (e) {
@@ -279,10 +284,19 @@ class ArrayT extends T {
   }
 }
 
+class NeverT extends T {
+  constructor() {
+    super()
+
+    this.validate(v => v === undefined, 'only undefined can be entered in never type')
+  }
+}
+
 module.exports = {
   T,
   ObjectT,
   ArrayT,
   NotAtT,
   AtT,
+  NeverT
 }

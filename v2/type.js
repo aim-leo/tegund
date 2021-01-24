@@ -2,7 +2,7 @@ const {
   allTypes, isEmpty, isUndefined
 } = require('./validate')
 
-const { T, ObjectT, ArrayT, NotAtT, AtT } = require('./proto')
+const { T, ObjectT, ArrayT, NotAtT, AtT, NeverT } = require('./proto')
 
 const result = {
   at: (...types) => new AtT(...types),
@@ -15,13 +15,7 @@ const result = {
 
     return t
   },
-  never: () => {
-    const t = new T()
-
-    t.validate(v => !isUndefined(v))
-
-    return t
-  },
+  never: () => new NeverT(),
 }
 
 for (const type of allTypes) {
