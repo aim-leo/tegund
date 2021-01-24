@@ -9,6 +9,8 @@ const {
   inType,
 } = require('./validate')
 
+const { objectOverflow } = require('./helper')
+
 class T {
   constructor() {
     Object.assign(this, enumMixin)
@@ -194,6 +196,7 @@ class ObjectT extends T {
     super()
 
     this._child = null
+    this._strict = false
 
     if (child !== undefined) this.setChild(child)
   }
@@ -232,6 +235,19 @@ class ObjectT extends T {
     // test childs
     for (const index in datas) {
       const data = datas[index]
+
+      // strict validate
+      if (this._strict) {
+        const overflowKey = objectOverflow(data, this._child)
+        if (overflowKey) {
+          return new ValidateError({
+            message: `Cannot set properties other than Shema${
+              datas.length > 1 ? ', at index:' + index + ',' : ''
+            }, prop: ${overflowKey}`
+          })
+        }
+      }
+
       for (const childKey in this._child) {
         const value = data[childKey]
         const t = this._child[childKey]
@@ -257,6 +273,13 @@ class ObjectT extends T {
         }
       }
     }
+  }
+
+  strict(data = true) {
+    asset(data, 'Boolean', 'strict is expected a boolean')
+    this._strict = data
+
+    return this
   }
 }
 
