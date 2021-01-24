@@ -182,7 +182,7 @@ function asset(obj, validator, message) {
       )
     }
   } else if (isFunction(validator)) {
-    if (!validate(obj)) {
+    if (!validator(obj)) {
       throw new Error(message || 'validate error')
     }
   }

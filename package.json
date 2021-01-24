@@ -29,7 +29,8 @@
     "build": "node_modules/webpack/bin/webpack.js --config webpack.config.js --mode production",
     "test:basic": "jest test/basic.test.js",
     "test:condition": "jest test/condition.test.js",
-    "test:range": "jest test/range.test.js"
+    "test:range": "jest test/range.test.js",
+    "test:enum": "jest test/enum.test.js"
   },
   "dependencies": {},
   "devDependencies": {
