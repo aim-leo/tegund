@@ -12,7 +12,7 @@ const {
 // console.log(string().length(1).inspect('222'))
 // console.log(string().length(1).inspect('1'))
 // console.log(number().length(1).inspect('222'))
-console.log(string().enum(['1', '2']).inspect('1'))
+console.log(string().partten(/abc/).inspect('abcd'))
 
 // console.log(string().inspect(1))
 // console.log(object({ a: string() }).inspect({ a: 2 }))

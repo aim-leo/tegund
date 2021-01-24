@@ -21,7 +21,6 @@ const rangeMixin = {
     if (this._min !== undefined) {
       throw new Error('Can not reset min prop')
     }
-    console.log('min', min)
     asset(min, 'Integer', 'min expected a integer')
     asset(min, (val) => val > 0, 'min expected a integer gte then 0')
 
@@ -123,7 +122,33 @@ const enumMixin = {
   },
 }
 
+const parttenMixin = {
+  partten(reg) {
+    if (this._partten !== undefined) {
+      throw new Error('Can not reset partten prop')
+    }
+    asset(reg, 'Partten', 'partten expected a reg')
+
+    this._partten = reg
+
+    this.validate(this._validatePartten.bind(this))
+
+    return this
+  },
+  _validatePartten(data) {
+    if (this._partten === undefined) return
+    if (!['String', 'Number'].includes(this._type)) return
+
+    if (!this._partten.test(data)) {
+      return new ValidateError({
+        message: `expected a data match partten: /${this._partten.source}/${this._partten.flags}`,
+      })
+    }
+  }
+}
+
 module.exports = {
   rangeMixin,
   enumMixin,
+  parttenMixin
 }

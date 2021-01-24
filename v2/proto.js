@@ -1,12 +1,11 @@
 const { ValidateTypeError, ValidateError } = require('./error')
-const { rangeMixin, enumMixin } = require('./mixin')
+const { rangeMixin, enumMixin, parttenMixin } = require('./mixin')
 const {
   asset,
   isFunction,
   isString,
   getValidateByType,
-  allTypes,
-  isBoolean,
+  allTypes
 } = require('./validate')
 
 class T {
@@ -25,6 +24,10 @@ class T {
 
     if (['String', 'Array'].includes(this._type)) {
       Object.assign(this, rangeMixin)
+    }
+
+    if (['String', 'Number'].includes(this._type)) {
+      Object.assign(this, parttenMixin)
     }
 
     return this
