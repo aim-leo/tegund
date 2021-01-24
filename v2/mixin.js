@@ -100,7 +100,7 @@ const enumMixin = {
 
     // validate enum value
     if (isFunction(this.check)) {
-      const err = this.inspect(...arr)
+      const err = this.test(...arr)
 
       if (err) throw err
     }

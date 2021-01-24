@@ -171,17 +171,17 @@ function getValidateType(validate) {
   )
 }
 
-function asset(obj, validate, message) {
-  if (isString(validate)) {
-    const v = getValidateByType(validate)
+function asset(obj, validator, message) {
+  if (isString(validator)) {
+    const v = getValidateByType(validator)
 
     if (!v(obj)) {
       throw new Error(
         message ||
-          `obj expected a ${validate} type, but got a ${whatType(obj)}`
+          `obj expected a ${validator} type, but got a ${whatType(obj)}`
       )
     }
-  } else if (isFunction(validate)) {
+  } else if (isFunction(validator)) {
     if (!validate(obj)) {
       throw new Error(message || 'validate error')
     }

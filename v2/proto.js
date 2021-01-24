@@ -5,7 +5,8 @@ const {
   isFunction,
   isString,
   getValidateByType,
-  allTypes
+  allTypes,
+  inType
 } = require('./validate')
 
 class T {
@@ -15,6 +16,7 @@ class T {
     this._type = null
 
     this._validate = []
+    this._optional = false
   }
 
   type(type) {
@@ -44,7 +46,7 @@ class T {
   }
 
   // return a object like { pass: false, message: 'not a valid string' }
-  inspect(...datas) {
+  test(...datas) {
     if (datas.length === 0) {
       return new ValidateError({
         message: `None is not a ${this._type} type`,
@@ -52,7 +54,11 @@ class T {
     }
     for (const index in datas) {
       const data = datas[index]
-      // inspect root type
+
+      // if is undefined, and set optional
+      if (data === undefined && this._optional) continue
+
+      // test root type
       let typeValid = false
 
       if (!this._type) {
@@ -72,7 +78,7 @@ class T {
         })
       }
 
-      // inspect addtional validate
+      // test addtional validate
       for (const v of this._validate) {
         const res = v.validator(data)
         if (res instanceof ValidateError) return res
@@ -82,13 +88,19 @@ class T {
   }
 
   check(...datas) {
-    const error = this.inspect(...datas)
+    const error = this.test(...datas)
 
     if (error instanceof ValidateError) {
       return false
     }
 
     return true
+  }
+
+  optional(data) {
+    this._optional = data
+
+    return this
   }
 
   _format2TypeString(type) {
@@ -135,14 +147,14 @@ class AtT extends T {
     return this
   }
 
-  inspect(...datas) {
-    const result = super.inspect(...datas)
+  test(...datas) {
+    const result = super.test(...datas)
 
     if (result) return result
 
     const pass = (data) => {
       for (const type of this._maybeCondition) {
-        const e = type.inspect(data)
+        const e = type.test(data)
 
         if (!e) {
           return true
@@ -208,19 +220,19 @@ class ObjectT extends T {
     this._child = result
   }
 
-  inspect(...datas) {
-    const result = super.inspect(...datas)
+  test(...datas) {
+    const result = super.test(...datas)
 
     if (result) return result
 
-    // inspect childs
+    // test childs
     for (const index in datas) {
       const data = datas[index]
       for (const childKey in this._child) {
         const value = data[childKey]
         const t = this._child[childKey]
 
-        const e = t.inspect(value)
+        const e = t.test(value)
         if (e) {
           return new ValidateError({
             ...e,
@@ -247,18 +259,18 @@ class ArrayT extends T {
     this._child = new AtT(...childs)
   }
 
-  inspect(...datas) {
-    const result = super.inspect(...datas)
+  test(...datas) {
+    const result = super.test(...datas)
 
     if (result) return result
 
     if (!this._child) return 
 
-    // inspect childs
+    // test childs
     for (const index of datas) {
       const data = datas[index]
 
-      const e = this._child.inspect(...data)
+      const e = this._child.test(...data)
 
       if (e) {
         return e

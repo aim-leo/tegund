@@ -9,14 +9,23 @@ const {
   array,
 } = require('../v2/type')
 
-// console.log(string().length(1).inspect('222'))
-// console.log(string().length(1).inspect('1'))
-// console.log(number().length(1).inspect('222'))
-console.log(string().partten(/abc/).inspect('abcd'))
+// console.log(string().length(1).test('222'))
+// console.log(string().length(1).test('1'))
+// console.log(number().length(1).test('222'))
+// console.log(string().partten(/abc/).optional(true).test(undefined))
 
-// console.log(string().inspect(1))
-// console.log(object({ a: string() }).inspect({ a: 2 }))
-// console.log(at(string(), number()).inspect(true))
+console.log(
+  object({
+    a: string(),
+    b: number().optional()
+  }).test({
+    a: ''
+  })
+)
+
+// console.log(string().test(1))
+// console.log(object({ a: string() }).test({ a: 2 }))
+// console.log(at(string(), number()).test(true))
 // console.log(object({ a: string(), b: number() }).check({ a: '', b: 1, c: 2 }))
 // console.log(object({ a: object({ b: string() }) }).check({ a: { b: ''} }))
 // console.log(
