@@ -30,7 +30,9 @@
     "test:basic": "jest test/basic.test.js",
     "test:condition": "jest test/condition.test.js",
     "test:range": "jest test/range.test.js",
-    "test:enum": "jest test/enum.test.js"
+    "test:enum": "jest test/enum.test.js",
+    "test:suger": "jest test/suger.test.js",
+    "test:partten": "jest test/partten.test.js"
   },
   "dependencies": {},
   "devDependencies": {

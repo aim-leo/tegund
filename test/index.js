@@ -15,6 +15,7 @@ const {
 // console.log(number().length(1).test('222'))
 // console.log(string().partten(/abc/).optional(true).test(undefined))
 
+console.log(never().test())
 
 console.log(
   object({
@@ -23,7 +24,8 @@ console.log(
     c: never()
   }).test({
     a: '',
-    c: 1
+    c: undefined,
+    s: ''
   })
 )
 

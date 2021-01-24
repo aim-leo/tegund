@@ -6,7 +6,7 @@ const {
   isString,
   getValidateByType,
   allTypes,
-  inType
+  inType,
 } = require('./validate')
 
 class T {
@@ -45,9 +45,16 @@ class T {
     })
   }
 
-  // return a object like { pass: false, message: 'not a valid string' }
   test(...datas) {
-    if (datas.length === 0) {
+    if (this instanceof NeverT) {
+      return datas.length > 0
+        ? new ValidateError({
+            message: `${
+              datas.length > 1 ? 'Index:' + index + ',' : ''
+            } this field is not allow to entered>>>`,
+          })
+        : undefined
+    } else if (datas.length === 0) {
       return new ValidateError({
         message: `None is not a ${this._type} type`,
       })
@@ -229,22 +236,24 @@ class ObjectT extends T {
         const value = data[childKey]
         const t = this._child[childKey]
 
-        if (t instanceof NeverT && childKey in data) {
-          return new ValidateError({
-            message: `${
-              datas.length > 1 ? 'Index:' + index + ',' : ''
-            }field ${childKey} is never allow to entered`,
-          })
-        }
-
-        const e = t.test(value)
-        if (e) {
-          return new ValidateError({
-            ...e,
-            message: `${
-              datas.length > 1 ? 'Index:' + index + ',' : ''
-            }field ${childKey} is validate error, ${e.message}`,
-          })
+        if (t instanceof NeverT) {
+          return childKey in data
+            ? new ValidateError({
+                message: `${
+                  datas.length > 1 ? 'Index:' + index + ',' : ''
+                }field ${childKey} is not allow to entered`,
+              })
+            : undefined
+        } else {
+          const e = t.test(value)
+          if (e) {
+            return new ValidateError({
+              ...e,
+              message: `${
+                datas.length > 1 ? 'Index:' + index + ',' : ''
+              }field ${childKey} is validate error, ${e.message}`,
+            })
+          }
         }
       }
     }
@@ -269,7 +278,7 @@ class ArrayT extends T {
 
     if (result) return result
 
-    if (!this._child) return 
+    if (!this._child) return
 
     // test childs
     for (const index of datas) {
@@ -284,13 +293,7 @@ class ArrayT extends T {
   }
 }
 
-class NeverT extends T {
-  constructor() {
-    super()
-
-    this.validate(v => v === undefined, 'only undefined can be entered in never type')
-  }
-}
+class NeverT extends T {}
 
 module.exports = {
   T,
@@ -298,5 +301,5 @@ module.exports = {
   ArrayT,
   NotAtT,
   AtT,
-  NeverT
+  NeverT,
 }
