@@ -9,6 +9,7 @@ const {
   getValidateByType,
   allTypes,
   inType,
+  isObject,
 } = require('./validate')
 
 const { objectOverflow } = require('./helper')
@@ -310,11 +311,20 @@ class ObjectT extends T {
     return this
   }
 
-  clone() {
+  extend(...args) {
+    for (let item of args) {
+      if (item instanceof ObjectT) {
+        this._child = Object.assign(this._child || {}, item._child)
+      } else if (isObject(item)) {
+        item = new ObjectT(item)
+        this._child = Object.assign(this._child || {}, item._child)
+      } else {
+        throw new Error(`combine expected a object or a ObjectT, but got a ${item}`)
+      }
+    }
 
+    return this
   }
-
-  extend() {}
 }
 
 class ArrayT extends T {
