@@ -11,7 +11,7 @@ const result = {
   empty: () => {
     const t = new T()
 
-    t.validate(isEmpty)
+    t.addValidator({ validator: isEmpty })
 
     return t
   },

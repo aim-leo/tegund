@@ -76,3 +76,13 @@ test(`validate min max of array`, () => {
   expect(array().max(2).check([1, 2, 3])).toBe(false)
   expect(array().max(2).check([1])).toBe(true)
 })
+
+test(`reset length of string`, () => {
+  const t = string().length(2)
+  expect(t.check('')).toBe(false)
+  expect(t.check('11')).toBe(true)
+
+  t.length(0)
+
+  expect(t.check('')).toBe(true)
+})

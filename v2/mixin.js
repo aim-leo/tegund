@@ -4,23 +4,20 @@ const { asset, isFunction } = require('./validate')
 
 const rangeMixin = {
   length(length) {
-    if (this._length !== undefined) {
-      throw new Error('Can not reset length prop')
-    }
     asset(length, 'Integer', 'length expected a integer')
-    asset(length, (val) => val > 0, 'length expected a integer gte then 0')
+    asset(length, (val) => val >= 0, 'length expected a integer gte then 0')
 
     this._length = length
 
     // add a validator
-    this.validate(this._validateLength.bind(this))
+    this.addValidator({
+      name: 'Length',
+      validator: this._validateLength.bind(this),
+    })
 
     return this
   },
   min(min) {
-    if (this._min !== undefined) {
-      throw new Error('Can not reset min prop')
-    }
     asset(min, 'Integer', 'min expected a integer')
     asset(min, (val) => val > 0, 'min expected a integer gte then 0')
 
@@ -34,14 +31,11 @@ const rangeMixin = {
 
     this._min = min
 
-    this.validate(this._validateMin.bind(this))
+    this.addValidator({ name: 'Min', validator: this._validateMin.bind(this) })
 
     return this
   },
   max(max) {
-    if (this._max !== undefined) {
-      throw new Error('Can not reset min prop')
-    }
     asset(max, 'Integer', 'max expected a integer')
     asset(max, (val) => val > 0, 'max expected a integer gte then 0')
 
@@ -55,7 +49,7 @@ const rangeMixin = {
 
     this._max = max
 
-    this.validate(this._validateMax.bind(this))
+    this.addValidator({ name: 'Max', validator: this._validateMax.bind(this) })
 
     return this
   },
@@ -93,9 +87,6 @@ const rangeMixin = {
 
 const enumMixin = {
   enum(arr) {
-    if (this._leng_enumth !== undefined) {
-      throw new Error('Can not reset enum prop')
-    }
     asset(arr, 'Array', 'enum expected a array')
 
     // validate enum value
@@ -107,7 +98,10 @@ const enumMixin = {
 
     this._enum = arr
 
-    this.validate(this._validateEnum.bind(this))
+    this.addValidator({
+      name: 'Enum',
+      validator: this._validateEnum.bind(this),
+    })
 
     return this
   },
@@ -124,14 +118,14 @@ const enumMixin = {
 
 const parttenMixin = {
   partten(reg) {
-    if (this._partten !== undefined) {
-      throw new Error('Can not reset partten prop')
-    }
     asset(reg, 'Partten', 'partten expected a reg')
 
     this._partten = reg
 
-    this.validate(this._validatePartten.bind(this))
+    this.addValidator({
+      name: 'Partten',
+      validator: this._validatePartten.bind(this),
+    })
 
     return this
   },
@@ -144,11 +138,11 @@ const parttenMixin = {
         message: `expected a data match partten: /${this._partten.source}/${this._partten.flags}`,
       })
     }
-  }
+  },
 }
 
 module.exports = {
   rangeMixin,
   enumMixin,
-  parttenMixin
+  parttenMixin,
 }

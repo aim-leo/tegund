@@ -1,3 +1,5 @@
+const clone = require('clone')
+
 const { ValidateTypeError, ValidateError } = require('./error')
 const { rangeMixin, enumMixin, parttenMixin } = require('./mixin')
 const {
@@ -37,14 +39,36 @@ class T {
     return this
   }
 
-  validate(validator, message) {
+  addValidator({ name, validator, message }) {
     asset(validator, 'Function')
     if (message) asset(message, 'String')
+    if (name) asset(name, 'String')
+
+    // if this validator has added, update it
+    if (name) {
+      const index = this._validate.map(item => item.name).indexOf(name)
+
+      if (index !== -1) {
+        this._validate.splice(index, 1)
+      }
+    }
 
     this._validate.push({
       validator,
       message,
+      name
     })
+  }
+
+  removeValidator(name) {
+    asset(name, 'String')
+    asset(name, val => !!val)
+
+    const index = this._validate.map(item => item.name).indexOf(name)
+
+    if (index !== -1) {
+      this._validate.splice(index, 1)
+    }
   }
 
   test(...datas) {
@@ -110,6 +134,10 @@ class T {
     this._optional = data
 
     return this
+  }
+
+  clone() {
+    return clone(this)
   }
 
   _format2TypeString(type) {
@@ -281,6 +309,12 @@ class ObjectT extends T {
 
     return this
   }
+
+  clone() {
+
+  }
+
+  extend() {}
 }
 
 class ArrayT extends T {
