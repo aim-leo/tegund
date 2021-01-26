@@ -1,3 +1,5 @@
+const { asset } = require('./validate')
+
 function objectOverflow(target, source) {
   for (const key in target) {
     if (!(key in source)) {
@@ -6,6 +8,24 @@ function objectOverflow(target, source) {
   }
 }
 
+function relateDate(date, targetDate) {
+  asset(date, 'Date')
+  asset(targetDate, 'Date')
+
+  const dateTime = date.getTime()
+  const targetDateTome = targetDate.getTime()
+
+  return dateTime === targetDateTome ? 0 : (dateTime < targetDateTome ? -1 : 1)
+}
+
+function formatDate(date) {
+  asset(date, 'Date')
+
+  return date.toISOString()
+}
+
 module.exports = {
-  objectOverflow
+  objectOverflow,
+  relateDate,
+  formatDate
 }

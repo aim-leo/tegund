@@ -2,6 +2,8 @@ const { ValidateError } = require('./error')
 
 const { asset, isFunction } = require('./validate')
 
+const { relateDate, formatDate } = require('./helper')
+
 const rangeMixin = {
   length(length) {
     asset(length, 'Integer', 'length expected a integer')
@@ -85,6 +87,69 @@ const rangeMixin = {
   },
 }
 
+const dateRangeMixin = {
+  min(min) {
+    asset(min, 'Date', 'min expected a date')
+
+    if (this._max) {
+      asset(
+        min,
+        (val) => relateDate(val, this._max) === -1,
+        `min scope expected a date before ${formatDate(
+          this._max
+        )}, but got a ${formatDate(data)}`
+      )
+    }
+
+    this._min = min
+
+    this.addValidator({ name: 'Min', validator: this._validateMin.bind(this) })
+
+    return this
+  },
+  max(max) {
+    asset(max, 'Date', 'max expected a date')
+
+    if (this._min) {
+      asset(
+        max,
+        (val) => relateDate(val, this._min) === 1,
+        `max scope expected a date after ${formatDate(this._min)}, but got a ${formatDate(
+          max
+        )}`
+      )
+    }
+
+    this._max = max
+
+    this.addValidator({ name: 'Max', validator: this._validateMax.bind(this) })
+
+    return this
+  },
+  _validateMin(data) {
+    if (this._min === undefined) return
+
+    if (relateDate(data, this._min) === -1) {
+      return new ValidateError({
+        message: `expected a date after ${formatDate(
+          this._min
+        )}, but got a ${formatDate(data)}`,
+      })
+    }
+  },
+  _validateMax(data) {
+    if (this._max === undefined) return
+
+    if (relateDate(data, this._max) === 1) {
+      return new ValidateError({
+        message: `expected a date before ${formatDate(
+          this._max
+        )}, but got a ${formatDate(data)}`,
+      })
+    }
+  },
+}
+
 const enumMixin = {
   enum(arr) {
     asset(arr, 'Array', 'enum expected a array')
@@ -145,4 +210,5 @@ module.exports = {
   rangeMixin,
   enumMixin,
   parttenMixin,
+  dateRangeMixin,
 }

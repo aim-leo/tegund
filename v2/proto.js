@@ -1,7 +1,7 @@
 const clone = require('clone')
 
 const { ValidateTypeError, ValidateError } = require('./error')
-const { rangeMixin, enumMixin, parttenMixin } = require('./mixin')
+const { rangeMixin, enumMixin, parttenMixin, dateRangeMixin } = require('./mixin')
 const {
   asset,
   isFunction,
@@ -35,6 +35,10 @@ class T {
 
     if (['String', 'Number'].includes(this._type)) {
       Object.assign(this, parttenMixin)
+    }
+
+    if (this._type === 'Date') {
+      Object.assign(this, dateRangeMixin)
     }
 
     return this

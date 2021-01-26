@@ -1,6 +1,6 @@
 const types = require('../v2/type')
 
-const { string, array } = types
+const { string, array, date } = types
 
 const { baseTypes } = require('./types')
 
@@ -8,17 +8,25 @@ test(`range mixin only extend by string and array`, () => {
   for (const type in baseTypes) {
     const t = types[type.toLowerCase()]
 
+    expect(() => {
+      t().min()
+    }).toThrow()
+
+    expect(() => {
+      t().max()
+    }).toThrow()
+
     if (!['String', 'Array'].includes(type)) {
       expect(() => {
         t().length()
       }).toThrow()
 
       expect(() => {
-        t().min()
+        t().min(1)
       }).toThrow()
 
       expect(() => {
-        t().max()
+        t().max(1)
       }).toThrow()
     }
   }
@@ -85,4 +93,31 @@ test(`reset length of string`, () => {
   t.length(0)
 
   expect(t.check('')).toBe(true)
+})
+
+
+// date range validate
+test(`validate date min max`, () => {
+  const minDate = new Date('2000-01-26T14:07:30.971Z')
+  const maxDate = new Date('2021-01-26T14:07:30.971Z')
+
+  const t = date().min(minDate).max(maxDate)
+
+  expect(
+    t.check(
+      new Date('1999-01-26T14:07:30.971Z')
+    )
+  ).toBe(false)
+
+  expect(
+    t.check(
+      new Date('2030-01-26T14:07:30.971Z')
+    )
+  ).toBe(false)
+
+  expect(
+    t.check(
+      new Date('2020-01-26T14:07:30.971Z')
+    )
+  ).toBe(true)
 })
