@@ -71,7 +71,7 @@ nullable
 
 or  // string().or(number()).or(boolean())
 
-## express
+## descriptor
 {
   a: 'string?',
   b: 'boolean',
@@ -83,6 +83,13 @@ or  // string().or(number()).or(boolean())
   h: 'object{a:string,b:number}',
   i: 'promise',
   j: '!parrten!empty'
+}
+
+{
+  a: {
+    b: 'string'
+  },
+  b: 'number'
 }
 
 ## validate
@@ -108,4 +115,28 @@ asset(string(), a, 'a is expected a string')
 
 ## typedAsset
 ## assetI18n
+
+# class
+
+@Tegund
+class BaseSchema {
+  @String
+  @Min(3)
+  @Max(10)
+  name
+
+  @Integer
+  @Min(0)
+  age
+
+  @Enum(1, 2)
+  category
+
+  @Array
+  @Optional
+  tag
+
+  @Computed(doc => doc.age > 60)
+  isOldMan = false
+}
 

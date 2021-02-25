@@ -8,7 +8,6 @@ const {
   isString,
   getValidateByType,
   allTypes,
-  inType,
   isObject,
 } = require('./validate')
 
