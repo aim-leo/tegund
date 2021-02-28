@@ -7,7 +7,6 @@ const {
   isFunction,
   isString,
   getValidateByType,
-  allTypes,
   isObject,
 } = require('./validate')
 
@@ -18,6 +17,7 @@ class T {
     Object.assign(this, enumMixin)
 
     this._type = null
+    this._alias = null
 
     this._validate = []
     this._optional = false
@@ -149,22 +149,19 @@ class T {
   _format2TypeString(type) {
     if (type instanceof T) {
       return type._type
-    } else if (isString(type) && allTypes.includes(type)) {
+    } else if (isString(type)) {
       return type
     }
   }
 
   _format2Type(...types) {
+    const allDefinedTypes = require('./type')
     const result = []
     for (let type of types) {
       if (type instanceof T) {
         result.push(type)
-      } else if (isString(type) && allTypes.includes(type)) {
-        const t = new T()
-
-        t.type(type)
-
-        result.push(t)
+      } else if (isString(type) && type in allDefinedTypes) {
+        result.push(allDefinedTypes[type]())
       }
     }
 
@@ -241,6 +238,7 @@ class ObjectT extends T {
     if (child instanceof T) return
 
     const result = {}
+    const allDefinedTypes = require('./type')
 
     // format all value to T
     for (const key in child) {
@@ -248,6 +246,9 @@ class ObjectT extends T {
 
       if (value instanceof T) {
         result[key] = value
+        continue
+      } else if (isString(value) && value in allDefinedTypes){
+        result[key] = allDefinedTypes[value]()
         continue
       }
 
@@ -301,7 +302,7 @@ class ObjectT extends T {
               ...e,
               message: `${
                 datas.length > 1 ? 'Index:' + index + ',' : ''
-              }field ${childKey} is validate error, ${e.message}`,
+              }field ${childKey} validate error, ${e.message}`,
             })
           }
         }

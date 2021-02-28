@@ -8,7 +8,7 @@ test(`strict only defined at object`, () => {
   for (const type in baseTypes) {
     const t = types[type.toLowerCase()]
 
-    if (type !== 'Object') {
+    if (type !== 'object') {
       expect(() => {
         t().strict()
       }).toThrow()

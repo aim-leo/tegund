@@ -24,8 +24,17 @@ function formatDate(date) {
   return date.toISOString()
 }
 
+function defineEnumerableProperty(target, key, value) {
+  Object.defineProperty(target, key, {
+    value,
+    enumerable: false,
+    writable: true,
+  })
+}
+
 module.exports = {
   objectOverflow,
   relateDate,
-  formatDate
+  formatDate,
+  defineEnumerableProperty
 }

@@ -1,18 +1,18 @@
 const baseTypes = {
-  'Boolean': true,
-  'String': 'string',
-  'Number': 1,
-  'Symbol': Symbol(),
-  'Promise': Promise.resolve(),
-  'NaN': NaN,
-  'Undefined': undefined,
-  'Pattern': /s/,
-  'SyncFunction': () => { },
-  'AsyncFunction': async () => { },
-  'Date': new Date(),
-  'Set': new Set(),
-  'Object': {},
-  'Array': []
+  'boolean': true,
+  'string': 'string',
+  'number': 1,
+  'symbol': Symbol(),
+  'promise': Promise.resolve(),
+  'nan': NaN,
+  'undefined': undefined,
+  'pattern': /s/,
+  'syncfunction': () => { },
+  'asyncfunction': async () => { },
+  'date': new Date(),
+  'set': new Set(),
+  'object': {},
+  'array': []
 }
 
 module.exports = {

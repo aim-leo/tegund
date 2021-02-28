@@ -36,6 +36,6 @@ for (const key in baseTypes) {
   const testIntResult = types.integer().check(baseTypes[key])
 
   test(`checking ${key} type is a Integer, result: ${testIntResult}`, () => {
-    expect(testIntResult).toBe(key === 'Number');
+    expect(testIntResult).toBe(key === 'number');
   });
 }
