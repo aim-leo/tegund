@@ -10,7 +10,7 @@
 -object
 -array
 -date
--partten
+-pattern
 -function
  -pureFunction
  -asyncFunction
@@ -62,7 +62,7 @@ optional
 empty
 
 validate
-partten
+pattern
 instance
 enum
 

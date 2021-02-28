@@ -69,7 +69,7 @@ function isUndefined(...objs) {
   return isType(...objs, undefined)
 }
 
-function isPartten(...objs) {
+function isPattern(...objs) {
   return isType(...objs, /d/)
 }
 
@@ -105,7 +105,7 @@ const baseTypes = [
   'Promise',
   'NaN',
   'Undefined',
-  'Partten',
+  'Pattern',
   'Function',
   'SyncFunction',
   'AsyncFunction',
@@ -146,7 +146,7 @@ const allValidates = {
   isObject,
   isNull,
   isPromise,
-  isPartten,
+  isPattern,
   isDate,
   isSet,
   isEmpty,

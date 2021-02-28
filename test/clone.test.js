@@ -17,11 +17,11 @@ test(`clone a string`, () => {
 
   // modify
   const reg = /abc/
-  t2.length(2).optional(false).partten(reg)
+  t2.length(2).optional(false).pattern(reg)
 
   expect(t2._length).toBe(2);
   expect(t2._optional).toBe(false);
-  expect(t2._partten).toBe(reg);
+  expect(t2._pattern).toBe(reg);
 
   // test deep
   expect(t._type).toBe('String');

@@ -1,13 +1,13 @@
-const { isString, whatType } = require('./validate')
+const { isString, whatType, isFunction } = require('./validate')
 
 class ValidateError extends Error {
   constructor({ message = 'Validate error!', source } = {}) {
     super(message)
 
-    if (!isString(message)) {
-      console.error('message expected a string')
+    if (!isString(message) && !isFunction(message)) {
+      console.error('message expected a string || function')
     }
-    this.message = message
+    this.message = typeof message === 'function' ? message(source) : message
     this.source = source
     this.name = 'ValidateError'
   }

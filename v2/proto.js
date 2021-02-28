@@ -1,7 +1,7 @@
 const clone = require('clone')
 
 const { ValidateTypeError, ValidateError } = require('./error')
-const { rangeMixin, enumMixin, parttenMixin, dateRangeMixin } = require('./mixin')
+const { rangeMixin, enumMixin, patternMixin, dateRangeMixin } = require('./mixin')
 const {
   asset,
   isFunction,
@@ -33,7 +33,7 @@ class T {
     }
 
     if (['String', 'Number'].includes(this._type)) {
-      Object.assign(this, parttenMixin)
+      Object.assign(this, patternMixin)
     }
 
     if (this._type === 'Date') {
@@ -45,7 +45,9 @@ class T {
 
   addValidator({ name, validator, message }) {
     asset(validator, 'Function')
-    if (message) asset(message, 'String')
+    if (message && !isString(message) && !isFunction(message)) {
+      throw new Error('message expected a string || function')
+    }
     if (name) asset(name, 'String')
 
     // if this validator has added, update it
@@ -119,7 +121,7 @@ class T {
       for (const v of this._validate) {
         const res = v.validator(data)
         if (res instanceof ValidateError) return res
-        if (res === false) return new ValidateError({ message: v.message })
+        if (res === false) return new ValidateError({ message: v.message, source: data })
       }
     }
   }

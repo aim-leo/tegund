@@ -6,27 +6,27 @@ const { baseTypes } = require('./types')
 
 const reg = /abc/
 
-test(`partten mixin only extend by string and number`, () => {
+test(`pattern mixin only extend by string and number`, () => {
   for (const type in baseTypes) {
     const t = types[type.toLowerCase()]
 
     if (!['String', 'Number'].includes(type)) {
       expect(() => {
-        t().partten()
+        t().pattern()
       }).toThrow()
     }
   }
 })
 
-test(`set partten of string`, () => {
-  expect(string()._partten).toBe(undefined)
-  expect(string().partten(reg)._partten).toBe(reg)
+test(`set pattern of string`, () => {
+  expect(string()._pattern).toBe(undefined)
+  expect(string().pattern(reg)._pattern).toBe(reg)
   expect(() => {
-    string().partten('')
+    string().pattern('')
   }).toThrow()
 })
 
-test(`validate partten of string`, () => {
-  expect(string().partten(reg).check('')).toBe(false)
-  expect(string().partten(reg).check('abc')).toBe(true)
+test(`validate pattern of string`, () => {
+  expect(string().pattern(reg).check('')).toBe(false)
+  expect(string().pattern(reg).check('abc')).toBe(true)
 })

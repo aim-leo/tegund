@@ -1,5 +1,5 @@
 const {
-  allTypes, isEmpty, isUndefined
+  allTypes, isEmpty
 } = require('./validate')
 
 const { T, ObjectT, ArrayT, NotAtT, AtT, NeverT } = require('./proto')

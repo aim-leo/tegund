@@ -6,7 +6,7 @@ const baseTypes = {
   'Promise': Promise.resolve(),
   'NaN': NaN,
   'Undefined': undefined,
-  'Partten': /s/,
+  'Pattern': /s/,
   'SyncFunction': () => { },
   'AsyncFunction': async () => { },
   'Date': new Date(),

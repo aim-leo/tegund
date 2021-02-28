@@ -32,7 +32,7 @@
     "test:range": "jest test/range.test.js",
     "test:enum": "jest test/enum.test.js",
     "test:suger": "jest test/suger.test.js",
-    "test:partten": "jest test/partten.test.js",
+    "test:pattern": "jest test/pattern.test.js",
     "test:strict": "jest test/strict.test.js",
     "test:clone": "jest test/clone.test.js"
   },
