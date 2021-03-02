@@ -1,7 +1,12 @@
 const clone = require('clone')
 
 const { ValidateTypeError, ValidateError } = require('./error')
-const { rangeMixin, enumMixin, patternMixin, dateRangeMixin } = require('./mixin')
+const {
+  rangeMixin,
+  enumMixin,
+  patternMixin,
+  dateRangeMixin,
+} = require('./mixin')
 const {
   asset,
   isFunction,
@@ -52,7 +57,7 @@ class T {
 
     // if this validator has added, update it
     if (name) {
-      const index = this._validate.map(item => item.name).indexOf(name)
+      const index = this._validate.map((item) => item.name).indexOf(name)
 
       if (index !== -1) {
         this._validate.splice(index, 1)
@@ -62,15 +67,15 @@ class T {
     this._validate.push({
       validator,
       message,
-      name
+      name,
     })
   }
 
   removeValidator(name) {
     asset(name, 'String')
-    asset(name, val => !!val)
+    asset(name, (val) => !!val)
 
-    const index = this._validate.map(item => item.name).indexOf(name)
+    const index = this._validate.map((item) => item.name).indexOf(name)
 
     if (index !== -1) {
       this._validate.splice(index, 1)
@@ -121,7 +126,8 @@ class T {
       for (const v of this._validate) {
         const res = v.validator(data)
         if (res instanceof ValidateError) return res
-        if (res === false) return new ValidateError({ message: v.message, source: data })
+        if (res === false)
+          return new ValidateError({ message: v.message, source: data })
       }
     }
   }
@@ -247,7 +253,7 @@ class ObjectT extends T {
       if (value instanceof T) {
         result[key] = value
         continue
-      } else if (isString(value) && value in allDefinedTypes){
+      } else if (isString(value) && value in allDefinedTypes) {
         result[key] = allDefinedTypes[value]()
         continue
       }
@@ -278,7 +284,7 @@ class ObjectT extends T {
           return new ValidateError({
             message: `Cannot set properties other than Shema${
               datas.length > 1 ? ', at index:' + index + ',' : ''
-            }, prop: ${overflowKey}`
+            }, prop: ${overflowKey}`,
           })
         }
       }
@@ -325,7 +331,9 @@ class ObjectT extends T {
         item = new ObjectT(item)
         this._child = Object.assign(this._child || {}, item._child)
       } else {
-        throw new Error(`combine expected a object or a ObjectT, but got a ${item}`)
+        throw new Error(
+          `combine expected a object or a ObjectT, but got a ${item}`
+        )
       }
     }
 
@@ -338,12 +346,54 @@ class ArrayT extends T {
     super()
 
     this._child = null
+    this._childCate = null
 
     if (childs.length > 0) this.setChild(...childs)
   }
 
+  // if childs has one arg, and first arg is a [], mines struct, eg: array([string(), boolean()]), so we need input a array like that ['1', true]
+  // if the childs has many args, so every arg should be a T
   setChild(...childs) {
-    this._child = new AtT(...childs)
+    this._childCate = null
+    this._child = null
+
+    if (childs.length === 0) {
+      return this
+    }
+
+    if (childs.length === 1 && Array.isArray(childs[0])) {
+      if (childs[0].length === 0) {
+        throw new Error('array struct should not be empty')
+      }
+      this._child = []
+      // every one of this array should be T
+      for (const key in childs[0]) {
+        const item = childs[0][key]
+        if (item === undefined) continue
+
+        const t = this._format2Type(item)[0]
+
+        if (!(t instanceof T)) {
+          throw new Error('every item of array should be a T')
+        }
+
+        this._child[key] = t
+      }
+
+      return this
+    }
+
+    // every one of args should be T
+    const ts = this._format2Type(...childs)
+    for (const item of ts) {
+      if (!(item instanceof T)) {
+        throw new Error('every item of array should be a T')
+      }
+    }
+
+    this._childCate = childs.length === 1 ? ts[0] : new AtT(...ts)
+
+    return this
   }
 
   test(...datas) {
@@ -351,16 +401,29 @@ class ArrayT extends T {
 
     if (result) return result
 
-    if (!this._child) return
+    if (this._child) {
+      // test childs
+      for (const data of datas) {
+        for (const index in this._child) {
+          const t = this._child[index]
+          if (!t) {
+            continue
+          }
 
-    // test childs
-    for (const index of datas) {
-      const data = datas[index]
+          const childErr = t.test(data[index])
+          if (childErr) {
+            return childErr
+          }
+        }
+      }
+    }
+    if (this._childCate) {
+      for (const data of datas) {
+        const childCateErr = this._childCate.test(...data)
 
-      const e = this._child.test(...data)
-
-      if (e) {
-        return e
+        if (childCateErr) {
+          return childCateErr
+        }
       }
     }
   }

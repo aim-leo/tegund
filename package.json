@@ -36,10 +36,13 @@
     "test:strict": "jest test/strict.test.js",
     "test:clone": "jest test/clone.test.js"
   },
-  "dependencies": {},
+  "dependencies": {
+    "clone": "^2.1.2"
+  },
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/node": "^7.5.5",
+    "@babel/plugin-proposal-decorators": "^7.13.5",
     "@babel/preset-env": "^7.5.5",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.0.3",
