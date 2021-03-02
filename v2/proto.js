@@ -48,6 +48,14 @@ class T {
     return this
   }
 
+  alias(name) {
+    asset(name, 'String', 'alias expected a string')
+
+    this._alias = name
+
+    return this
+  }
+
   addValidator({ name, validator, message }) {
     asset(validator, 'Function')
     if (message && !isString(message) && !isFunction(message)) {
