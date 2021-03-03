@@ -1,4 +1,4 @@
-const { string, object, integer, date } = require('../v2/type')
+const { string, object, integer, date, at, number } = require('../v2/type')
 const { T } = require('../v2/proto')
 
 // test function type

@@ -93,6 +93,69 @@ const rangeMixin = {
   },
 }
 
+const numberRangeMixin = {
+  min(min, message) {
+    asset(min, 'Integer', 'min expected a integer')
+
+    if (this._max) {
+      asset(
+        min,
+        (val) => val <= this._max,
+        `min expected a integer lte then max: ${this._max}`
+      )
+    }
+
+    this._min = min
+
+    this.addValidator({
+      name: 'Min',
+      validator: this._validateMin.bind(this),
+      message:
+        message ||
+        ((data) =>
+          `expected a ${this._type}, value gte than ${this._min}, but got a: ${data}`),
+    })
+
+    return this
+  },
+  max(max, message) {
+    asset(max, 'Integer', 'max expected a integer')
+
+    if (this._min) {
+      asset(
+        max,
+        (val) => val >= this._min,
+        `min expected a value integer lte then max: ${this._min}`
+      )
+    }
+
+    this._max = max
+
+    this.addValidator({
+      name: 'Max',
+      validator: this._validateMax.bind(this),
+      message:
+        message ||
+        ((data) =>
+          `expected a ${this._type}, value lte than ${this._max}, but got a: ${data}`),
+    })
+
+    return this
+  },
+  _validateMin(data) {
+    if (this._min === undefined) return
+    if (!['Number', 'Integer', "Float"].includes(this._type)) return
+
+    return data >= this._min
+  },
+  _validateMax(data) {
+    if (this._max === undefined) return
+    if (!['Number', 'Integer', "Float"].includes(this._type)) return
+
+    return data <= this._max
+  },
+}
+
 const dateRangeMixin = {
   min(min, message) {
     asset(min, 'Date', 'min expected a date')
@@ -218,11 +281,12 @@ const patternMixin = {
 
 function useMixin(target, mixin) {
   for (const key in mixin) {
-    if (key.indexOf('_') === -1) {
-      target[key] = mixin[key]
-    } else {
-      defineEnumerableProperty(target, key, mixin[key])
-    }
+    target[key] = mixin[key]
+    // if (key.indexOf('_') === -1) {
+    //   target[key] = mixin[key]
+    // } else {
+    //   defineEnumerableProperty(target, key, mixin[key])
+    // }
   }
 }
 
@@ -231,6 +295,7 @@ module.exports = {
   enumMixin,
   patternMixin,
   dateRangeMixin,
+  numberRangeMixin,
 
   useMixin
 }

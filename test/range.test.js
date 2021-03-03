@@ -18,9 +18,11 @@ test(`range mixin only extend by string and array`, () => {
 
     if (!['string', 'array'].includes(type)) {
       expect(() => {
-        t().length()
+        t().length(1)
       }).toThrow()
+    }
 
+    if (!['string', 'array', 'number', 'integer', 'float'].includes(type)) {
       expect(() => {
         t().min(1)
       }).toThrow()

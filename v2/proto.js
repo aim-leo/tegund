@@ -6,7 +6,8 @@ const {
   enumMixin,
   patternMixin,
   dateRangeMixin,
-  useMixin
+  numberRangeMixin,
+  useMixin,
 } = require('./mixin')
 const {
   asset,
@@ -38,7 +39,11 @@ class T {
       useMixin(this, rangeMixin)
     }
 
-    if (['String', 'Number'].includes(this._type)) {
+    if (['Number', 'Integer', 'Float'].includes(this._type)) {
+      useMixin(this, numberRangeMixin)
+    }
+
+    if (['String', 'Number', 'Integer', 'Float'].includes(this._type)) {
       useMixin(this, patternMixin)
     }
 
@@ -158,7 +163,11 @@ class T {
   }
 
   clone() {
-    return clone(this)
+    const t = new T()
+
+    Object.assign(t, this)
+
+    return t
   }
 
   _format2TypeString(type) {
@@ -189,7 +198,6 @@ class AtT extends T {
     super()
 
     this._maybeCondition = []
-    this._isReverse = false
 
     this.or(...types)
   }
@@ -218,22 +226,34 @@ class AtT extends T {
     }
 
     for (const data of datas) {
-      if (!this._isReverse && !pass(data)) {
+      if (!(this instanceof NotAtT) && !pass(data)) {
         return new ValidateError()
       }
 
-      if (this._isReverse && pass(data)) {
+      if (this instanceof NotAtT && pass(data)) {
         return new ValidateError()
       }
     }
   }
+
+  clone() {
+    const t = new AtT()
+    Object.assign(t, this)
+
+    t._maybeCondition = this._maybeCondition.map((item) => item.clone())
+
+    return t
+  }
 }
 
 class NotAtT extends AtT {
-  constructor(...args) {
-    super(...args)
+  clone() {
+    const t = new NotAtT()
+    Object.assign(t, this)
 
-    this._isReverse = true
+    t._maybeCondition = this._maybeCondition.map((item) => item.clone())
+
+    return t
   }
 }
 
@@ -348,6 +368,17 @@ class ObjectT extends T {
 
     return this
   }
+
+  clone() {
+    const t = new ObjectT()
+    Object.assign(t, this)
+
+    for (const prop in this._child) {
+      t._child[prop] = this._child[prop].clone()
+    }
+
+    return t
+  }
 }
 
 class ArrayT extends T {
@@ -436,9 +467,33 @@ class ArrayT extends T {
       }
     }
   }
+
+  clone() {
+    const t = new ArrayT()
+    Object.assign(t, this)
+
+    for (const prop in this._child) {
+      t._child[prop] = this._child[prop].clone()
+    }
+
+    if (Array.isArray(this._childCate)) {
+      t._childCate = this._childCate.map((item) => item.clone())
+    } else {
+      t._childCate = this._childCate.clone()
+    }
+
+    return t
+  }
 }
 
-class NeverT extends T {}
+class NeverT extends T {
+  clone() {
+    const t = new NeverT()
+    Object.assign(t, this)
+
+    return t
+  }
+}
 
 module.exports = {
   T,
