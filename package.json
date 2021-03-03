@@ -36,9 +36,7 @@
     "test:strict": "jest test/strict.test.js",
     "test:clone": "jest test/clone.test.js"
   },
-  "dependencies": {
-    "clone": "^2.1.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/node": "^7.5.5",

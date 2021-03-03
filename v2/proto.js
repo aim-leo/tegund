@@ -1,5 +1,3 @@
-const clone = require('clone')
-
 const { ValidateTypeError, ValidateError } = require('./error')
 const {
   rangeMixin,
