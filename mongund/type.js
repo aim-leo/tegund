@@ -29,12 +29,7 @@ defineType(
     .schemaType('ObjectId')
 )
 
-defineType(
-  'any',
-  type
-    .any()
-    .schemaType('Mixed')
-)
+defineType('any', new MongoT().schemaType('Mixed'))
 
 function defineType(alias, t) {
   if (alias in type) {

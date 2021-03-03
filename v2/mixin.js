@@ -2,7 +2,7 @@ const { ValidateError } = require('./error')
 
 const { asset, isFunction } = require('./validate')
 
-const { relateDate, formatDate } = require('./helper')
+const { relateDate, formatDate, defineEnumerableProperty } = require('./helper')
 
 const rangeMixin = {
   length(length, message) {
@@ -216,9 +216,21 @@ const patternMixin = {
   },
 }
 
+function useMixin(target, mixin) {
+  for (const key in mixin) {
+    if (key.indexOf('_') === -1) {
+      target[key] = mixin[key]
+    } else {
+      defineEnumerableProperty(target, key, mixin[key])
+    }
+  }
+}
+
 module.exports = {
   rangeMixin,
   enumMixin,
   patternMixin,
   dateRangeMixin,
+
+  useMixin
 }

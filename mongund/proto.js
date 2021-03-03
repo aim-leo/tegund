@@ -1,16 +1,26 @@
 const { T, ArrayT } = require('../v2/proto')
 
-const {
-  asset
-} = require('../v2/validate')
+const { asset } = require('../v2/validate')
+
+const { defineEnumerableProperty } = require('../v2/helper')
 
 class MongoT extends T {
   constructor(...args) {
     super(...args)
 
-    this._schemaType = null
     this._default = null
-    this._unique = false
+
+    this._defineProp({
+      key: 'schemaType',
+      type: 'String',
+    })
+
+    this._defineProp({
+      key: 'getter',
+      type: 'Function',
+    })
+
+    this._defineBooleanProps('unique', 'exclude')
   }
 
   default(val) {
@@ -25,28 +35,39 @@ class MongoT extends T {
     return this
   }
 
-  unique(flag = true) {
-    asset(t, 'Boolean', 'unique expected a boolean')
+  _defineProp({ key, type, defaultValue = null, argDefaultValue }) {
+    asset(key, 'String', 'prop key expected a string')
+    asset(type, 'String', 'prop type expected a string')
 
-    this._unique = flag;
+    this[`_${key}`] = defaultValue
 
-    return this;
+    defineEnumerableProperty(this, key, (val = argDefaultValue) => {
+      asset(val, type, `${key} expected a ${type}`)
+
+      this[`_${key}`] = val
+
+      return this
+    })
   }
 
-  schemaType(t) {
-    asset(t, 'String', 'schemaType expected a string')
+  _defineBooleanProps(...args) {
+    for (const key of args) {
+      this._defineProp({
+        key,
+        type: 'Boolean',
+        defaultValue: false,
+        argDefaultValue: true,
+      })
+    }
+  }
 
-    this._schemaType = t
-
-    return this
+  clone() {
+    console.log(Object.keys(this))
   }
 }
 
-class MongoArrayT extends ArrayT {
-  
-}
-
+class MongoArrayT extends ArrayT {}
 
 module.exports = {
-  MongoT
+  MongoT,
 }

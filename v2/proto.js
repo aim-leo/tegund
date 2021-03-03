@@ -6,6 +6,7 @@ const {
   enumMixin,
   patternMixin,
   dateRangeMixin,
+  useMixin
 } = require('./mixin')
 const {
   asset,
@@ -19,13 +20,13 @@ const { objectOverflow } = require('./helper')
 
 class T {
   constructor() {
-    Object.assign(this, enumMixin)
-
     this._type = null
     this._alias = null
 
     this._validate = []
     this._optional = false
+
+    useMixin(this, enumMixin)
   }
 
   type(type) {
@@ -34,15 +35,15 @@ class T {
     this._type = result
 
     if (['String', 'Array'].includes(this._type)) {
-      Object.assign(this, rangeMixin)
+      useMixin(this, rangeMixin)
     }
 
     if (['String', 'Number'].includes(this._type)) {
-      Object.assign(this, patternMixin)
+      useMixin(this, patternMixin)
     }
 
     if (this._type === 'Date') {
-      Object.assign(this, dateRangeMixin)
+      useMixin(this, dateRangeMixin)
     }
 
     return this
