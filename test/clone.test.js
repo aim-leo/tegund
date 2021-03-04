@@ -1,5 +1,5 @@
-const { string, object, integer, date, at, number } = require('../v2/type')
-const { T } = require('../v2/proto')
+const { string, object, integer, date, at, number } = require('../src/type')
+const { T } = require('../src/proto')
 
 // test function type
 test(`clone a string`, () => {

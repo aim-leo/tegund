@@ -1,10 +1,10 @@
 {
   "name": "tegund",
-  "version": "1.0.3",
+  "version": "2.1.0",
   "description": "Simple type judgment tool for js",
   "author": "aimleo",
   "license": "MIT",
-  "main": "dist/tegund.js",
+  "main": "dist/tegund.umd.js",
   "publishConfig": {
     "access": "public"
   },
@@ -34,7 +34,8 @@
     "test:suger": "jest test/suger.test.js",
     "test:pattern": "jest test/pattern.test.js",
     "test:strict": "jest test/strict.test.js",
-    "test:clone": "jest test/clone.test.js"
+    "test:clone": "jest test/clone.test.js",
+    "test": "jest"
   },
   "dependencies": {},
   "devDependencies": {

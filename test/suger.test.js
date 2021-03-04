@@ -6,7 +6,7 @@ const {
   number,
   empty,
   array,
-} = require('../v2/type')
+} = require('../src/type')
 
 const { baseTypes } = require('./types')
 
@@ -70,7 +70,7 @@ test('test array every child', () => {
 })
 
 test('test array struct', () => {
-  expect(array(string()).check([])).toBe(false)
+  expect(array(string()).check([])).toBe(true)
   expect(array(string()).check([1])).toBe(false)
   expect(array(string()).check(['1', 1])).toBe(false)
   expect(array(string()).check(['1', '2'])).toBe(true)

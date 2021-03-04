@@ -1,4 +1,4 @@
-const { string } = require('../v2/type')
+const { string } = require('../src/type')
 
 // test function type
 test(`set enum of string`, () => {

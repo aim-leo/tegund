@@ -1,4 +1,4 @@
-const types = require('../v2/type')
+const types = require('../src/type')
 
 const { object, string } = types
 
@@ -43,4 +43,23 @@ test(`validate strict of object`, () => {
       b: ''
     })
   ).toBe(false)
+})
+
+test(`test provided`, () => {
+  expect(
+    object({
+      name: string(),
+      content: string()
+    }).test({
+      name: '',
+    })
+  ).not.toBe(undefined)
+  expect(
+    object({
+      name: string(),
+      content: string()
+    }).testProvided({
+      name: '',
+    })
+  ).toBe(undefined)
 })

@@ -1,5 +1,5 @@
 
-const types = require('../v2/type')
+const types = require('../src/type')
 
 const { baseTypes } = require('./types')
 

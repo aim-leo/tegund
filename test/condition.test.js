@@ -1,4 +1,4 @@
-const { at, string, number, notat, any, empty } = require('../v2/type')
+const { at, string, number, notat, any, empty } = require('../src/type')
 
 const { baseTypes } = require('./types')
 

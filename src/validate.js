@@ -42,11 +42,11 @@ function isNumber(...objs) {
 }
 
 function isInteger(...objs) {
-  return isNumber(...objs) && objs.every(obj => obj%1 === 0)
+  return isNumber(...objs) && objs.every((obj) => obj % 1 === 0)
 }
 
 function isFloat(...objs) {
-  return isNumber(...objs) && objs.every(obj => obj%1 !== 0)
+  return isNumber(...objs) && objs.every((obj) => obj % 1 !== 0)
 }
 
 function isSymbol(...objs) {
@@ -94,7 +94,14 @@ function isSet(...objs) {
 }
 
 function isEmpty(...objs) {
-  return objs.every(obj => obj === '' || obj === 0 || obj === undefined || obj === null || Number.isNaN(obj))
+  return objs.every(
+    (obj) =>
+      obj === '' ||
+      obj === 0 ||
+      obj === undefined ||
+      obj === null ||
+      Number.isNaN(obj)
+  )
 }
 
 const baseTypes = [
@@ -113,22 +120,11 @@ const baseTypes = [
   'Set'
 ]
 
-const sugerTypes = [
-  'Float',
-  'Integer',
-  'Empty'
-]
+const sugerTypes = ['Float', 'Integer', 'Empty']
 
-const stuctTypes = [
-  'Object',
-  'Array'
-]
+const stuctTypes = ['Object', 'Array']
 
-const allTypes = [
-  ...baseTypes,
-  ...sugerTypes,
-  ...stuctTypes
-]
+const allTypes = [...baseTypes, ...sugerTypes, ...stuctTypes]
 
 const allValidates = {
   isArray,
@@ -149,7 +145,7 @@ const allValidates = {
   isPattern,
   isDate,
   isSet,
-  isEmpty,
+  isEmpty
 }
 
 function getValidateByType(type) {
@@ -165,27 +161,46 @@ function getValidateType(validate) {
   if (!isFunction(validate)) {
     throw new Error('validate expected a function')
   }
-  return validate.name.replace(
-    'is',
-    ''
-  )
+  return validate.name.replace('is', '')
 }
 
 function asset(obj, validator, message) {
-  if (isString(validator)) {
-    const v = getValidateByType(validator)
-
-    if (!v(obj)) {
-      throw new Error(
-        message ||
-          `obj expected a ${validator} type, but got a ${whatType(obj)}`
-      )
-    }
-  } else if (isFunction(validator)) {
+  if (isFunction(validator)) {
     if (!validator(obj)) {
       throw new Error(message || 'validate error')
     }
+
+    return
   }
+
+  if (isString(validator)) validator = [validator]
+
+  if (isArray(validator)) {
+    for (const item of validator) {
+      if (!isString(item)) {
+        throw new Error(
+          'asset validator expected a string array | string | function'
+        )
+      }
+
+      const v = getValidateByType(item)
+
+      if (v(obj)) {
+        return
+      }
+    }
+
+    throw new Error(
+      message ||
+        `obj expected a ${validator.join(' | ')} type, but got a ${whatType(
+          obj
+        )}`
+    )
+  }
+
+  throw new Error(
+    'asset validator expected a string array | string | function'
+  )
 }
 
 module.exports = {

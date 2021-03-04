@@ -1,8 +1,6 @@
-const { ValidateError } = require('./error')
-
 const { asset, isFunction } = require('./validate')
 
-const { relateDate, formatDate, defineEnumerableProperty } = require('./helper')
+const { relateDate, formatDate } = require('./helper')
 
 const rangeMixin = {
   length(length, message) {
@@ -18,7 +16,7 @@ const rangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, length at ${this._length}, but got a length: ${data.length}`),
+          `expected a ${this._type}, length at ${this._length}, but got a length: ${data.length}`)
     })
 
     return this
@@ -43,7 +41,7 @@ const rangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, length gte than ${this._min}, but got a length: ${data.length}`),
+          `expected a ${this._type}, length gte than ${this._min}, but got a length: ${data.length}`)
     })
 
     return this
@@ -68,7 +66,7 @@ const rangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, length lte than ${this._max}, but got a length: ${data.length}`),
+          `expected a ${this._type}, length lte than ${this._max}, but got a length: ${data.length}`)
     })
 
     return this
@@ -90,7 +88,7 @@ const rangeMixin = {
     if (!['String', 'Array'].includes(this._type)) return
 
     return data.length <= this._max
-  },
+  }
 }
 
 const numberRangeMixin = {
@@ -113,7 +111,7 @@ const numberRangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, value gte than ${this._min}, but got a: ${data}`),
+          `expected a ${this._type}, value gte than ${this._min}, but got a: ${data}`)
     })
 
     return this
@@ -137,23 +135,23 @@ const numberRangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, value lte than ${this._max}, but got a: ${data}`),
+          `expected a ${this._type}, value lte than ${this._max}, but got a: ${data}`)
     })
 
     return this
   },
   _validateMin(data) {
     if (this._min === undefined) return
-    if (!['Number', 'Integer', "Float"].includes(this._type)) return
+    if (!['Number', 'Integer', 'Float'].includes(this._type)) return
 
     return data >= this._min
   },
   _validateMax(data) {
     if (this._max === undefined) return
-    if (!['Number', 'Integer', "Float"].includes(this._type)) return
+    if (!['Number', 'Integer', 'Float'].includes(this._type)) return
 
     return data <= this._max
-  },
+  }
 }
 
 const dateRangeMixin = {
@@ -166,7 +164,7 @@ const dateRangeMixin = {
         (val) => relateDate(val, this._max) === -1,
         `min scope expected a date before ${formatDate(
           this._max
-        )}, but got a ${formatDate(data)}`
+        )}, but got a ${formatDate(min)}`
       )
     }
 
@@ -180,7 +178,7 @@ const dateRangeMixin = {
         ((data) =>
           `expected a date after ${formatDate(
             this._min
-          )}, but got a ${formatDate(data)}`),
+          )}, but got a ${formatDate(data)}`)
     })
 
     return this
@@ -208,7 +206,7 @@ const dateRangeMixin = {
         ((data) =>
           `expected a date before ${formatDate(
             this._max
-          )}, but got a ${formatDate(data)}`),
+          )}, but got a ${formatDate(data)}`)
     })
 
     return this
@@ -222,7 +220,7 @@ const dateRangeMixin = {
     if (this._max === undefined) return
 
     return relateDate(data, this._max) !== 1
-  },
+  }
 }
 
 const enumMixin = {
@@ -243,7 +241,7 @@ const enumMixin = {
       validator: this._validateEnum.bind(this),
       message:
         message ||
-        ((data) => `expected a data value at ${this._enum}, but got a ${data}`),
+        ((data) => `expected a data value at ${this._enum}, but got a ${data}`)
     })
 
     return this
@@ -252,7 +250,7 @@ const enumMixin = {
     if (this._enum === undefined) return
 
     return this._enum.includes(data)
-  },
+  }
 }
 
 const patternMixin = {
@@ -266,7 +264,7 @@ const patternMixin = {
       validator: this._validatePattern.bind(this),
       message:
         message ||
-        `expected a data match pattern: /${this._pattern.source}/${this._pattern.flags}`,
+        `expected a data match pattern: /${this._pattern.source}/${this._pattern.flags}`
     })
 
     return this
@@ -276,7 +274,7 @@ const patternMixin = {
     if (!['String', 'Number'].includes(this._type)) return
 
     return this._pattern.test(data)
-  },
+  }
 }
 
 function useMixin(target, mixin) {
@@ -285,7 +283,7 @@ function useMixin(target, mixin) {
     // if (key.indexOf('_') === -1) {
     //   target[key] = mixin[key]
     // } else {
-    //   defineEnumerableProperty(target, key, mixin[key])
+    //   defineUnEnumerableProperty(target, key, mixin[key])
     // }
   }
 }

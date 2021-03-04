@@ -4,7 +4,7 @@ const conf = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'tegund.js',
+    filename: 'tegund.umd.js',
     library: 'tegund',
     libraryTarget: 'umd',
     globalObject: 'this'

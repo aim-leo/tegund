@@ -1,11 +1,13 @@
 const type = require('./type')
-const typedArray = require('./typed-array')
-const asset = require('./asset')
-const extra = require('./extra')
+const proto = require('./proto')
+const error = require('./error')
+
+const { defineUnEnumerableProperty, removeEmpty } = require('./helper')
 
 module.exports = {
   ...type,
-  ...typedArray,
-  ...asset,
-  ...extra
+  ...proto,
+  ...error,
+  defineUnEnumerableProperty,
+  removeEmpty,
 }

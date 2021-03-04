@@ -5,14 +5,14 @@ const {
   patternMixin,
   dateRangeMixin,
   numberRangeMixin,
-  useMixin,
+  useMixin
 } = require('./mixin')
 const {
   asset,
   isFunction,
   isString,
   getValidateByType,
-  isObject,
+  isObject
 } = require('./validate')
 
 const { objectOverflow } = require('./helper')
@@ -24,6 +24,8 @@ class T {
 
     this._validate = []
     this._optional = false
+
+    this._context = {}
 
     useMixin(this, enumMixin)
   }
@@ -60,6 +62,32 @@ class T {
     return this
   }
 
+  forbid(val = true) {
+    asset(val, 'Boolean')
+
+    this.constructor = val ? NeverT : T
+
+    return this
+  }
+
+  setContext(key, value) {
+    asset(key, 'String', 'context expected a object')
+
+    this._context[key] = value
+
+    return this
+  }
+
+  clearContext(key) {
+    if (key) {
+      delete this._context[key]
+    } else {
+      this._context = {}
+    }
+
+    return this
+  }
+
   addValidator({ name, validator, message }) {
     asset(validator, 'Function')
     if (message && !isString(message) && !isFunction(message)) {
@@ -79,8 +107,10 @@ class T {
     this._validate.push({
       validator,
       message,
-      name,
+      name
     })
+
+    return this
   }
 
   removeValidator(name) {
@@ -95,53 +125,62 @@ class T {
   }
 
   test(...datas) {
-    if (this instanceof NeverT) {
-      return datas.length > 0
-        ? new ValidateError({
-            message: `${
-              datas.length > 1 ? 'Index:' + index + ',' : ''
-            } this field is not allow to entered>>>`,
+    function test() {
+      if (this.constructor === NeverT) {
+        return datas.length > 0
+          ? new ValidateError({
+            message: 'this field is not allow to entered'
           })
-        : undefined
-    } else if (datas.length === 0) {
-      return new ValidateError({
-        message: `None is not a ${this._type} type`,
-      })
-    }
-    for (const index in datas) {
-      const data = datas[index]
-
-      // if is undefined, and set optional
-      if (data === undefined && this._optional) continue
-
-      // test root type
-      let typeValid = false
-
-      if (!this._type) {
-        typeValid = true
-      } else {
-        const typeV = getValidateByType(this._type)
-        if (isFunction(typeV) && typeV(data)) {
-          typeValid = true
-        }
-      }
-
-      if (!typeValid) {
-        return new ValidateTypeError({
-          source: data,
-          index,
-          type: this._type,
+          : undefined
+      } else if (datas.length === 0) {
+        return new ValidateError({
+          message: `None is not a ${this._type} type`
         })
       }
+      for (const index in datas) {
+        const data = datas[index]
 
-      // test addtional validate
-      for (const v of this._validate) {
-        const res = v.validator(data)
-        if (res instanceof ValidateError) return res
-        if (res === false)
-          return new ValidateError({ message: v.message, source: data })
+        // if is undefined, and set optional
+        if (data === undefined && this._optional) continue
+
+        // test root type
+        let typeValid = false
+
+        if (!this._type) {
+          typeValid = true
+        } else {
+          const typeV = getValidateByType(this._type)
+          if (isFunction(typeV) && typeV(data)) {
+            typeValid = true
+          }
+        }
+
+        if (!typeValid) {
+          return new ValidateTypeError({
+            source: data,
+            index,
+            type: this._type
+          })
+        }
+
+        // test addtional validate
+        for (const v of this._validate) {
+          const res = v.validator.call(this, data)
+          if (res instanceof ValidateError) return res
+          if (res === false) { return new ValidateError({ message: v.message, source: data }) }
+        }
       }
     }
+
+    let testResult = null
+
+    try {
+      testResult = test.call(this)
+    } catch (e) {
+      return e
+    }
+
+    return testResult
   }
 
   check(...datas) {
@@ -179,7 +218,7 @@ class T {
   _format2Type(...types) {
     const allDefinedTypes = require('./type')
     const result = []
-    for (let type of types) {
+    for (const type of types) {
       if (type instanceof T) {
         result.push(type)
       } else if (isString(type) && type in allDefinedTypes) {
@@ -224,6 +263,10 @@ class AtT extends T {
     }
 
     for (const data of datas) {
+      if (data === undefined && this._optional) {
+        continue
+      }
+
       if (!(this instanceof NotAtT) && !pass(data)) {
         return new ValidateError()
       }
@@ -241,6 +284,32 @@ class AtT extends T {
     t._maybeCondition = this._maybeCondition.map((item) => item.clone())
 
     return t
+  }
+
+  setContext(...args) {
+    super.setContext(...args)
+
+    // set context to child
+    if (this._maybeCondition) {
+      for (const t of this._maybeCondition) {
+        t.setContext(...args)
+      }
+    }
+
+    return this
+  }
+
+  clearContext(...args) {
+    super.clearContext(...args)
+
+    // set context to child
+    if (this._maybeCondition) {
+      for (const t of this._maybeCondition) {
+        t.clearContext(...args)
+      }
+    }
+
+    return this
   }
 }
 
@@ -262,6 +331,8 @@ class ObjectT extends T {
     this._child = null
     this._strict = false
 
+    this.type('Object')
+
     if (child !== undefined) this.setChild(child)
   }
 
@@ -275,72 +346,39 @@ class ObjectT extends T {
 
     // format all value to T
     for (const key in child) {
-      let value = child[key]
+      const value = child[key]
 
       if (value instanceof T) {
         result[key] = value
         continue
-      } else if (isString(value) && value in allDefinedTypes) {
-        result[key] = allDefinedTypes[value]()
+      } else if (isString(value)) {
+        if (value in allDefinedTypes) {
+          result[key] = allDefinedTypes[value]()
+        } else {
+          const t = new T()
+          t.type(value)
+
+          result[key] = t
+        }
         continue
+      } else if (Array.isArray(value)) {
+        result[key] = new ArrayT(value)
+      } else if (typeof value === 'object') {
+        result[key] = new ObjectT(value)
       }
-
-      const t = new T()
-
-      t.type(value)
-
-      result[key] = t
     }
 
     this._child = result
   }
 
-  test(...datas) {
-    const result = super.test(...datas)
+  testProvided(...datas) {
+    this.setContext('ignoreUnprovided', true)
 
-    if (result) return result
+    const res = this.test(...datas)
 
-    // test childs
-    for (const index in datas) {
-      const data = datas[index]
+    this.clearContext('ignoreUnprovided')
 
-      // strict validate
-      if (this._strict) {
-        const overflowKey = objectOverflow(data, this._child)
-        if (overflowKey) {
-          return new ValidateError({
-            message: `Cannot set properties other than Shema${
-              datas.length > 1 ? ', at index:' + index + ',' : ''
-            }, prop: ${overflowKey}`,
-          })
-        }
-      }
-
-      for (const childKey in this._child) {
-        const value = data[childKey]
-        const t = this._child[childKey]
-
-        if (t instanceof NeverT) {
-          return childKey in data
-            ? new ValidateError({
-                message: `${
-                  datas.length > 1 ? 'Index:' + index + ',' : ''
-                }field ${childKey} is not allow to entered`,
-              })
-            : undefined
-        } else {
-          const e = t.test(value)
-          if (e) {
-            return new ValidateError({
-              ...e,
-              message: `${
-                datas.length > 1 ? 'Index:' + index + ',' : ''
-              }field ${childKey} validate error, ${e.message}`,
-            })
-          }
-        }
-      }
-    }
+    return res
   }
 
   strict(data = true) {
@@ -377,6 +415,82 @@ class ObjectT extends T {
 
     return t
   }
+
+  setContext(...args) {
+    super.setContext(...args)
+
+    // set context to child
+    if (this._child) {
+      for (const prop in this._child) {
+        this._child[prop].setContext(...args)
+      }
+    }
+
+    return this
+  }
+
+  clearContext(...args) {
+    super.clearContext(...args)
+
+    // set context to child
+    if (this._child) {
+      for (const prop in this._child) {
+        this._child[prop].clearContext(...args)
+      }
+    }
+
+    return this
+  }
+
+  test(...datas) {
+    const result = super.test(...datas)
+
+    if (result) return result
+
+    // test childs
+    for (const index in datas) {
+      const data = datas[index]
+
+      // strict validate
+      if (this._strict) {
+        const overflowKey = objectOverflow(data, this._child)
+        if (overflowKey) {
+          return new ValidateError({
+            message: `Cannot set properties other than Shema${
+              datas.length > 1 ? ', at index:' + index + ',' : ''
+            }, prop: ${overflowKey}`
+          })
+        }
+      }
+
+      for (const childKey in this._child) {
+        if (this._context.ignoreUnprovided && !(childKey in data)) continue
+
+        const value = data[childKey]
+        const t = this._child[childKey]
+
+        if (t.constructor === NeverT) {
+          return childKey in data
+            ? new ValidateError({
+              message: `${
+                datas.length > 1 ? 'Index:' + index + ',' : ''
+              }field ${childKey} is not allow to entered`
+            })
+            : undefined
+        } else {
+          const e = t.test(value)
+          if (e) {
+            return new ValidateError({
+              ...e,
+              message: `${
+                datas.length > 1 ? 'Index:' + index + ',' : ''
+              }field ${childKey} validate error, ${e.message}`
+            })
+          }
+        }
+      }
+    }
+  }
 }
 
 class ArrayT extends T {
@@ -385,6 +499,8 @@ class ArrayT extends T {
 
     this._child = null
     this._childCate = null
+
+    this.type('Array')
 
     if (childs.length > 0) this.setChild(...childs)
   }
@@ -436,7 +552,6 @@ class ArrayT extends T {
 
   test(...datas) {
     const result = super.test(...datas)
-
     if (result) return result
 
     if (this._child) {
@@ -457,6 +572,7 @@ class ArrayT extends T {
     }
     if (this._childCate) {
       for (const data of datas) {
+        if (data.length === 0) continue
         const childCateErr = this._childCate.test(...data)
 
         if (childCateErr) {
@@ -476,11 +592,37 @@ class ArrayT extends T {
 
     if (Array.isArray(this._childCate)) {
       t._childCate = this._childCate.map((item) => item.clone())
-    } else {
+    } else if (this._childCate instanceof T) {
       t._childCate = this._childCate.clone()
     }
 
     return t
+  }
+
+  setContext(...args) {
+    super.setContext(...args)
+
+    // set context to child
+    if (this._childCate) {
+      this._childCate.setContext(...args)
+    } else if (this._child) {
+      this._child.map(item => item.setContext(...args))
+    }
+
+    return this
+  }
+
+  clearContext(...args) {
+    super.clearContext(...args)
+
+    // set context to child
+    if (this._childCate) {
+      this._childCate.clearContext(...args)
+    } else if (this._child) {
+      this._child.map(item => item.clearContext(...args))
+    }
+
+    return this
   }
 }
 
@@ -499,5 +641,5 @@ module.exports = {
   ArrayT,
   NotAtT,
   AtT,
-  NeverT,
+  NeverT
 }

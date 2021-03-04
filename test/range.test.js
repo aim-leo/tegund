@@ -1,4 +1,4 @@
-const types = require('../v2/type')
+const types = require('../src/type')
 
 const { string, array, date } = types
 
