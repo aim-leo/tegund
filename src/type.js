@@ -3,9 +3,9 @@ const {
 } = require('./validate')
 
 const { T, ObjectT, ArrayT, NotAtT, AtT, NeverT } = require('./proto')
-const { defineUnEnumerableProperty } = require('./helper')
 
 const type = {
+  defineType,
   at: (...types) => new AtT(...types),
   notat: (...types) => new NotAtT(...types)
 }
@@ -35,7 +35,5 @@ function defineType(alias, t) {
 
   return type[alias]
 }
-
-defineUnEnumerableProperty(type, 'defineType', defineType)
 
 module.exports = type
