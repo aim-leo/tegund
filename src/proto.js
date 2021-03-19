@@ -97,11 +97,7 @@ class T {
 
     // if this validator has added, update it
     if (name) {
-      const index = this._validate.map((item) => item.name).indexOf(name)
-
-      if (index !== -1) {
-        this._validate.splice(index, 1)
-      }
+      this.removeValidator(name)
     }
 
     this._validate.push({
@@ -469,6 +465,11 @@ class ObjectT extends T {
         const value = data[childKey]
         const t = this._child[childKey]
 
+        // if is optional
+        if (t._optional && !data.hasOwnProperty(childKey)) {
+          continue
+        }
+
         if (t.constructor === NeverT) {
           return childKey in data
             ? new ValidateError({
@@ -573,6 +574,7 @@ class ArrayT extends T {
     if (this._childCate) {
       for (const data of datas) {
         if (data.length === 0) continue
+
         const childCateErr = this._childCate.test(...data)
 
         if (childCateErr) {
