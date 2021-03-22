@@ -110,11 +110,11 @@ is(n => n > 10, a)
 // if input a pure data, like string, number, float, means equal
 is(false, a)
 
-## asset
-asset(string(), a, 'a is expected a string')
+## assert
+assert(string(), a, 'a is expected a string')
 
-## typedAsset
-## assetI18n
+## typedassert
+## assertI18n
 
 # class
 

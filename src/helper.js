@@ -1,4 +1,4 @@
-const { asset, isUndefined, isNull, isNaN, isArray } = require('./validate')
+const { assert, isUndefined, isNull, isNaN, isArray } = require('./validate')
 
 function objectOverflow(target, source) {
   for (const key in target) {
@@ -9,8 +9,8 @@ function objectOverflow(target, source) {
 }
 
 function relateDate(date, targetDate) {
-  asset(date, 'Date')
-  asset(targetDate, 'Date')
+  assert(date, 'Date')
+  assert(targetDate, 'Date')
 
   const dateTime = date.getTime()
   const targetDateTime = targetDate.getTime()
@@ -19,7 +19,7 @@ function relateDate(date, targetDate) {
 }
 
 function formatDate(date) {
-  asset(date, 'Date')
+  assert(date, 'Date')
 
   return date.toISOString()
 }
@@ -43,7 +43,7 @@ function removeEmpty(
     removeFalse = false
   } = {}
 ) {
-  asset(obj, 'Object')
+  assert(obj, 'Object')
 
   const result = {}
   for (const key in obj) {

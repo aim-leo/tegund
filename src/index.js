@@ -1,7 +1,7 @@
 const type = require('./type')
 const proto = require('./proto')
 const error = require('./error')
-const { allValidates, getValidateByType, asset } = require('./validate')
+const { allValidates, getValidateByType, assert } = require('./validate')
 
 const { defineUnEnumerableProperty, removeEmpty } = require('./helper')
 
@@ -12,7 +12,7 @@ module.exports = {
   ...allValidates,
   
   getValidateByType,
-  asset,
+  assert,
   defineUnEnumerableProperty,
   removeEmpty,
 }

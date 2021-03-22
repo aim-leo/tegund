@@ -1,7 +1,7 @@
 const { isString, whatType, isFunction } = require('./validate')
 
 class ValidateError extends Error {
-  constructor({ message = 'Validate error!', source } = {}) {
+  constructor({ message = 'validate error!', source } = {}) {
     super(message)
 
     if (!isString(message) && !isFunction(message)) {

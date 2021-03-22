@@ -95,6 +95,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* 🐛 asset throw typedFunction expected a function ([b480c5a](https://github.com/aim-leo/tegund/commit/b480c5a5ac4944ea8dd8a9df9dcc19d262ad17c5))
+* 🐛 assert throw typedFunction expected a function ([b480c5a](https://github.com/aim-leo/tegund/commit/b480c5a5ac4944ea8dd8a9df9dcc19d262ad17c5))
 
 ### 1.0.1 (2020-10-09)

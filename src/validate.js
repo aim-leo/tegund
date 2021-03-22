@@ -164,7 +164,7 @@ function getValidateType(validate) {
   return validate.name.replace('is', '')
 }
 
-function asset(obj, validator, message) {
+function assert(obj, validator, message) {
   if (isFunction(validator)) {
     if (!validator(obj)) {
       throw new Error(message || 'validate error')
@@ -179,7 +179,7 @@ function asset(obj, validator, message) {
     for (const item of validator) {
       if (!isString(item)) {
         throw new Error(
-          'asset validator expected a string array | string | function'
+          'assert validator expected a string array | string | function'
         )
       }
 
@@ -199,7 +199,7 @@ function asset(obj, validator, message) {
   }
 
   throw new Error(
-    'asset validator expected a string array | string | function'
+    'assert validator expected a string array | string | function'
   )
 }
 
@@ -219,5 +219,5 @@ module.exports = {
   getValidateByType,
   getValidateType,
 
-  asset
+  assert
 }

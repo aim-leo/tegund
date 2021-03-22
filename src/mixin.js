@@ -1,11 +1,11 @@
-const { asset, isFunction } = require('./validate')
+const { assert, isFunction } = require('./validate')
 
 const { relateDate, formatDate } = require('./helper')
 
 const rangeMixin = {
   length(length, message) {
-    asset(length, 'Integer', 'length expected a integer')
-    asset(length, (val) => val >= 0, 'length expected a integer gte then 0')
+    assert(length, 'Integer', 'length expected a integer')
+    assert(length, (val) => val >= 0, 'length expected a integer gte then 0')
 
     this._length = length
 
@@ -22,11 +22,11 @@ const rangeMixin = {
     return this
   },
   min(min, message) {
-    asset(min, 'Integer', 'min expected a integer')
-    asset(min, (val) => val > 0, 'min expected a integer gte then 0')
+    assert(min, 'Integer', 'min expected a integer')
+    assert(min, (val) => val > 0, 'min expected a integer gte then 0')
 
     if (this._max) {
-      asset(
+      assert(
         min,
         (val) => val <= this._max,
         `min expected a integer lte then max: ${this._max}`
@@ -47,11 +47,11 @@ const rangeMixin = {
     return this
   },
   max(max, message) {
-    asset(max, 'Integer', 'max expected a integer')
-    asset(max, (val) => val > 0, 'max expected a integer gte then 0')
+    assert(max, 'Integer', 'max expected a integer')
+    assert(max, (val) => val > 0, 'max expected a integer gte then 0')
 
     if (this._min) {
-      asset(
+      assert(
         max,
         (val) => val >= this._min,
         `min expected a integer lte then max: ${this._min}`
@@ -93,10 +93,10 @@ const rangeMixin = {
 
 const numberRangeMixin = {
   min(min, message) {
-    asset(min, 'Integer', 'min expected a integer')
+    assert(min, 'Integer', 'min expected a integer')
 
     if (this._max) {
-      asset(
+      assert(
         min,
         (val) => val <= this._max,
         `min expected a integer lte then max: ${this._max}`
@@ -117,10 +117,10 @@ const numberRangeMixin = {
     return this
   },
   max(max, message) {
-    asset(max, 'Integer', 'max expected a integer')
+    assert(max, 'Integer', 'max expected a integer')
 
     if (this._min) {
-      asset(
+      assert(
         max,
         (val) => val >= this._min,
         `min expected a value integer lte then max: ${this._min}`
@@ -156,10 +156,10 @@ const numberRangeMixin = {
 
 const dateRangeMixin = {
   min(min, message) {
-    asset(min, 'Date', 'min expected a date')
+    assert(min, 'Date', 'min expected a date')
 
     if (this._max) {
-      asset(
+      assert(
         min,
         (val) => relateDate(val, this._max) === -1,
         `min scope expected a date before ${formatDate(
@@ -184,10 +184,10 @@ const dateRangeMixin = {
     return this
   },
   max(max, message) {
-    asset(max, 'Date', 'max expected a date')
+    assert(max, 'Date', 'max expected a date')
 
     if (this._min) {
-      asset(
+      assert(
         max,
         (val) => relateDate(val, this._min) === 1,
         `max scope expected a date after ${formatDate(
@@ -225,7 +225,7 @@ const dateRangeMixin = {
 
 const enumMixin = {
   enum(arr, message) {
-    asset(arr, 'Array', 'enum expected a array')
+    assert(arr, 'Array', 'enum expected a array')
 
     // validate enum value
     if (isFunction(this.check)) {
@@ -255,7 +255,7 @@ const enumMixin = {
 
 const patternMixin = {
   pattern(reg, message) {
-    asset(reg, 'Pattern', 'pattern expected a reg')
+    assert(reg, 'Pattern', 'pattern expected a reg')
 
     this._pattern = reg
 

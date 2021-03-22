@@ -5,14 +5,14 @@ const {
   patternMixin,
   dateRangeMixin,
   numberRangeMixin,
-  useMixin
+  useMixin,
 } = require('./mixin')
 const {
-  asset,
+  assert,
   isFunction,
   isString,
   getValidateByType,
-  isObject
+  isObject,
 } = require('./validate')
 
 const { objectOverflow } = require('./helper')
@@ -55,7 +55,7 @@ class T {
   }
 
   alias(name) {
-    asset(name, 'String', 'alias expected a string')
+    assert(name, 'String', 'alias expected a string')
 
     this._alias = name
 
@@ -63,15 +63,37 @@ class T {
   }
 
   forbid(val = true) {
-    asset(val, 'Boolean')
+    assert(val, 'Boolean')
 
     this.constructor = val ? NeverT : T
 
     return this
   }
 
+  instance(parent) {
+    assert(parent, 'SyncFunction')
+
+    this.addValidator({
+      name: 'InstanceValidator',
+      validator: (val) => val instanceof parent,
+      message: `data expected instance of parent: ${parent.name}`,
+    })
+
+    return this
+  }
+
+  or(...other) {
+    other = this._format2Type(...other)
+
+    const t = new AtT()
+
+    t.or(this, ...other)
+
+    return t
+  }
+
   setContext(key, value) {
-    asset(key, 'String', 'context expected a object')
+    assert(key, 'String', 'context expected a object')
 
     this._context[key] = value
 
@@ -89,11 +111,11 @@ class T {
   }
 
   addValidator({ name, validator, message }) {
-    asset(validator, 'Function')
+    assert(validator, 'Function')
     if (message && !isString(message) && !isFunction(message)) {
       throw new Error('message expected a string || function')
     }
-    if (name) asset(name, 'String')
+    if (name) assert(name, 'String')
 
     // if this validator has added, update it
     if (name) {
@@ -103,15 +125,15 @@ class T {
     this._validate.push({
       validator,
       message,
-      name
+      name,
     })
 
     return this
   }
 
   removeValidator(name) {
-    asset(name, 'String')
-    asset(name, (val) => !!val)
+    assert(name, 'String')
+    assert(name, (val) => !!val)
 
     const index = this._validate.map((item) => item.name).indexOf(name)
 
@@ -125,12 +147,12 @@ class T {
       if (this.constructor === NeverT) {
         return datas.length > 0
           ? new ValidateError({
-            message: 'this field is not allow to entered'
-          })
+              message: 'this field is not allow to entered',
+            })
           : undefined
       } else if (datas.length === 0) {
         return new ValidateError({
-          message: `None is not a ${this._type} type`
+          message: `None is not a ${this._type} type`,
         })
       }
       for (const index in datas) {
@@ -155,7 +177,7 @@ class T {
           return new ValidateTypeError({
             source: data,
             index,
-            type: this._type
+            type: this._type,
           })
         }
 
@@ -163,7 +185,9 @@ class T {
         for (const v of this._validate) {
           const res = v.validator.call(this, data)
           if (res instanceof ValidateError) return res
-          if (res === false) { return new ValidateError({ message: v.message, source: data }) }
+          if (res === false) {
+            return new ValidateError({ message: v.message, source: data })
+          }
         }
       }
     }
@@ -187,6 +211,14 @@ class T {
     }
 
     return true
+  }
+
+  assert(...datas) {
+    const error = this.test(...datas)
+
+    if (error instanceof ValidateError) {
+      throw error
+    }
   }
 
   optional(data = true) {
@@ -219,6 +251,8 @@ class T {
         result.push(type)
       } else if (isString(type) && type in allDefinedTypes) {
         result.push(allDefinedTypes[type]())
+      } else{
+        throw new Error(`type is not a valid T || t alias`)
       }
     }
 
@@ -333,7 +367,7 @@ class ObjectT extends T {
   }
 
   setChild(child) {
-    asset(child, 'Object')
+    assert(child, 'Object')
 
     if (child instanceof T) return
 
@@ -378,7 +412,7 @@ class ObjectT extends T {
   }
 
   strict(data = true) {
-    asset(data, 'Boolean', 'strict is expected a boolean')
+    assert(data, 'Boolean', 'strict is expected a boolean')
     this._strict = data
 
     return this
@@ -454,7 +488,7 @@ class ObjectT extends T {
           return new ValidateError({
             message: `Cannot set properties other than Shema${
               datas.length > 1 ? ', at index:' + index + ',' : ''
-            }, prop: ${overflowKey}`
+            }, prop: ${overflowKey}`,
           })
         }
       }
@@ -473,10 +507,10 @@ class ObjectT extends T {
         if (t.constructor === NeverT) {
           return childKey in data
             ? new ValidateError({
-              message: `${
-                datas.length > 1 ? 'Index:' + index + ',' : ''
-              }field ${childKey} is not allow to entered`
-            })
+                message: `${
+                  datas.length > 1 ? 'Index:' + index + ',' : ''
+                }field ${childKey} is not allow to entered`,
+              })
             : undefined
         } else {
           const e = t.test(value)
@@ -485,7 +519,7 @@ class ObjectT extends T {
               ...e,
               message: `${
                 datas.length > 1 ? 'Index:' + index + ',' : ''
-              }field ${childKey} validate error, ${e.message}`
+              }field ${childKey} validate error, ${e.message}`,
             })
           }
         }
@@ -608,7 +642,7 @@ class ArrayT extends T {
     if (this._childCate) {
       this._childCate.setContext(...args)
     } else if (this._child) {
-      this._child.map(item => item.setContext(...args))
+      this._child.map((item) => item.setContext(...args))
     }
 
     return this
@@ -621,7 +655,7 @@ class ArrayT extends T {
     if (this._childCate) {
       this._childCate.clearContext(...args)
     } else if (this._child) {
-      this._child.map(item => item.clearContext(...args))
+      this._child.map((item) => item.clearContext(...args))
     }
 
     return this
@@ -643,5 +677,5 @@ module.exports = {
   ArrayT,
   NotAtT,
   AtT,
-  NeverT
+  NeverT,
 }

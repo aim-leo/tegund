@@ -36,4 +36,7 @@ function defineType(alias, t) {
   return type[alias]
 }
 
+// add a alias for function
+type.func = type.function
+
 module.exports = type
