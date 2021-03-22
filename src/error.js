@@ -7,6 +7,7 @@ class ValidateError extends Error {
     if (!isString(message) && !isFunction(message)) {
       console.error('message expected a string || function')
     }
+    this.status = 400 // bad request
     this.message = typeof message === 'function' ? message(source) : message
     this.source = source
     this.name = 'ValidateError'
