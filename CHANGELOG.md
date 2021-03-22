@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/aim-leo/tegund/compare/v2.2.6...v2.3.0) (2021-03-22)
+
+
+### Features
+
+* add assert,instance,or method for T ([6a84790](https://github.com/aim-leo/tegund/commit/6a84790cf713050abdb69e1d17967da750b98a5a))
+
 ### [2.2.6](https://github.com/aim-leo/tegund/compare/v2.2.5...v2.2.6) (2021-03-22)
 
 ### [2.2.5](https://github.com/aim-leo/tegund/compare/v2.2.4...v2.2.5) (2021-03-22)
