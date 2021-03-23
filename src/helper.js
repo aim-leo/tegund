@@ -1,4 +1,11 @@
-const { assert, isUndefined, isNull, isNaN, isArray } = require('./validate')
+const {
+  assert,
+  isUndefined,
+  isNull,
+  isNaN,
+  isArray,
+  isString,
+} = require('./validate')
 
 function objectOverflow(target, source) {
   for (const key in target) {
@@ -28,7 +35,7 @@ function defineUnEnumerableProperty(target, key, value) {
   Object.defineProperty(target, key, {
     value,
     enumerable: false,
-    writable: true
+    writable: true,
   })
 }
 
@@ -40,7 +47,7 @@ function removeEmpty(
     removeNaN = false,
     removeEmptyString = false,
     removeEmptyArray = false,
-    removeFalse = false
+    removeFalse = false,
   } = {}
 ) {
   assert(obj, 'Object')
@@ -78,10 +85,38 @@ function removeEmpty(
   return result
 }
 
+function format2TypeString(type) {
+  const { T } = require('./proto')
+  if (type instanceof T) {
+    return type._type
+  } else if (isString(type)) {
+    return type
+  }
+}
+
+function format2Type(...types) {
+  const { T } = require('./proto')
+  const allDefinedTypes = require('./type')
+  const result = []
+  for (const type of types) {
+    if (type instanceof T) {
+      result.push(type)
+    } else if (isString(type) && type in allDefinedTypes) {
+      result.push(allDefinedTypes[type]())
+    } else {
+      throw new Error(`type is not a valid T || t alias`)
+    }
+  }
+
+  return result
+}
+
 module.exports = {
   objectOverflow,
   relateDate,
   formatDate,
   defineUnEnumerableProperty,
-  removeEmpty
+  removeEmpty,
+  format2TypeString,
+  format2Type,
 }

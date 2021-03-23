@@ -86,7 +86,7 @@ function isFunction(...objs) {
 }
 
 function isDate(...objs) {
-  return objs.every((obj) => isType(obj, new Date()))
+  return objs.every((obj) => isType(obj, new Date()) && !isNaN(obj.getTime()))
 }
 
 function isSet(...objs) {

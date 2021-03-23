@@ -5,7 +5,10 @@ const {
   patternMixin,
   dateRangeMixin,
   numberRangeMixin,
-  useMixin,
+  dateMixin,
+  stringMixin,
+  numberMixin,
+  booleanMixin,
 } = require('./mixin')
 const {
   assert,
@@ -15,7 +18,7 @@ const {
   isObject,
 } = require('./validate')
 
-const { objectOverflow } = require('./helper')
+const { objectOverflow, format2TypeString, format2Type } = require('./helper')
 
 class T {
   constructor() {
@@ -23,32 +26,41 @@ class T {
     this._alias = null
 
     this._validate = []
+    this._transform = []
     this._optional = false
 
     this._context = {}
 
-    useMixin(this, enumMixin)
+    Object.assign(this, enumMixin)
   }
 
   type(type) {
-    const result = this._format2TypeString(type)
+    if (this._type && this._type !== type) {
+      throw new Error('type can not modify')
+    }
+
+    const result = format2TypeString(type)
 
     this._type = result
 
-    if (['String', 'Array'].includes(this._type)) {
-      useMixin(this, rangeMixin)
-    }
-
     if (['Number', 'Integer', 'Float'].includes(this._type)) {
-      useMixin(this, numberRangeMixin)
+      Object.assign(this, numberRangeMixin, patternMixin, numberMixin)
     }
 
-    if (['String', 'Number', 'Integer', 'Float'].includes(this._type)) {
-      useMixin(this, patternMixin)
+    if (this._type === 'String') {
+      Object.assign(this, patternMixin, stringMixin, rangeMixin)
     }
 
     if (this._type === 'Date') {
-      useMixin(this, dateRangeMixin)
+      Object.assign(this, dateRangeMixin, dateMixin)
+    }
+
+    if (this._type === 'Array') {
+      Object.assign(this, rangeMixin)
+    }
+
+    if (this._type === 'Boolean') {
+      Object.assign(this, booleanMixin)
     }
 
     return this
@@ -83,13 +95,27 @@ class T {
   }
 
   or(...other) {
-    other = this._format2Type(...other)
+    other = format2Type(...other)
 
     const t = new AtT()
 
     t.or(this, ...other)
 
     return t
+  }
+
+  transform(...vals) {
+    if (!isFunction(...vals)) {
+      throw new Error('transform expected one or many function')
+    }
+
+    if (vals.length < 1) {
+      throw new Error('transform expected at least one arg')
+    }
+
+    this._transform.push(...vals)
+
+    return this
   }
 
   setContext(key, value) {
@@ -156,7 +182,18 @@ class T {
         })
       }
       for (const index in datas) {
-        const data = datas[index]
+        let data = datas[index]
+
+        // transform it
+        if (this._transform) {
+          for (const tran of this._transform) {
+            data = tran(data)
+
+            if (data instanceof ValidateError) {
+              return data
+            }
+          }
+        }
 
         // if is undefined, and set optional
         if (data === undefined && this._optional) continue
@@ -234,30 +271,6 @@ class T {
 
     return t
   }
-
-  _format2TypeString(type) {
-    if (type instanceof T) {
-      return type._type
-    } else if (isString(type)) {
-      return type
-    }
-  }
-
-  _format2Type(...types) {
-    const allDefinedTypes = require('./type')
-    const result = []
-    for (const type of types) {
-      if (type instanceof T) {
-        result.push(type)
-      } else if (isString(type) && type in allDefinedTypes) {
-        result.push(allDefinedTypes[type]())
-      } else{
-        throw new Error(`type is not a valid T || t alias`)
-      }
-    }
-
-    return result
-  }
 }
 
 class AtT extends T {
@@ -270,7 +283,7 @@ class AtT extends T {
   }
 
   or(...types) {
-    const result = this._format2Type(...types)
+    const result = format2Type(...types)
 
     result.map((t) => this._maybeCondition.push(t))
 
@@ -560,7 +573,7 @@ class ArrayT extends T {
         const item = childs[0][key]
         if (item === undefined) continue
 
-        const t = this._format2Type(item)[0]
+        const t = format2Type(item)[0]
 
         if (!(t instanceof T)) {
           throw new Error('every item of array should be a T')
@@ -573,7 +586,7 @@ class ArrayT extends T {
     }
 
     // every one of args should be T
-    const ts = this._format2Type(...childs)
+    const ts = format2Type(...childs)
     for (const item of ts) {
       if (!(item instanceof T)) {
         throw new Error('every item of array should be a T')

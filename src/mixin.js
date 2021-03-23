@@ -1,6 +1,7 @@
-const { assert, isFunction } = require('./validate')
+const { assert, isFunction, isDate } = require('./validate')
 
 const { relateDate, formatDate } = require('./helper')
+const { ValidateError } = require('./error')
 
 const rangeMixin = {
   length(length, message) {
@@ -16,7 +17,7 @@ const rangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, length at ${this._length}, but got a length: ${data.length}`)
+          `expected a ${this._type}, length at ${this._length}, but got a length: ${data.length}`),
     })
 
     return this
@@ -41,7 +42,7 @@ const rangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, length gte than ${this._min}, but got a length: ${data.length}`)
+          `expected a ${this._type}, length gte than ${this._min}, but got a length: ${data.length}`),
     })
 
     return this
@@ -66,7 +67,7 @@ const rangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, length lte than ${this._max}, but got a length: ${data.length}`)
+          `expected a ${this._type}, length lte than ${this._max}, but got a length: ${data.length}`),
     })
 
     return this
@@ -88,7 +89,7 @@ const rangeMixin = {
     if (!['String', 'Array'].includes(this._type)) return
 
     return data.length <= this._max
-  }
+  },
 }
 
 const numberRangeMixin = {
@@ -111,7 +112,7 @@ const numberRangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, value gte than ${this._min}, but got a: ${data}`)
+          `expected a ${this._type}, value gte than ${this._min}, but got a: ${data}`),
     })
 
     return this
@@ -135,7 +136,7 @@ const numberRangeMixin = {
       message:
         message ||
         ((data) =>
-          `expected a ${this._type}, value lte than ${this._max}, but got a: ${data}`)
+          `expected a ${this._type}, value lte than ${this._max}, but got a: ${data}`),
     })
 
     return this
@@ -151,7 +152,7 @@ const numberRangeMixin = {
     if (!['Number', 'Integer', 'Float'].includes(this._type)) return
 
     return data <= this._max
-  }
+  },
 }
 
 const dateRangeMixin = {
@@ -178,7 +179,7 @@ const dateRangeMixin = {
         ((data) =>
           `expected a date after ${formatDate(
             this._min
-          )}, but got a ${formatDate(data)}`)
+          )}, but got a ${formatDate(data)}`),
     })
 
     return this
@@ -206,7 +207,7 @@ const dateRangeMixin = {
         ((data) =>
           `expected a date before ${formatDate(
             this._max
-          )}, but got a ${formatDate(data)}`)
+          )}, but got a ${formatDate(data)}`),
     })
 
     return this
@@ -220,7 +221,7 @@ const dateRangeMixin = {
     if (this._max === undefined) return
 
     return relateDate(data, this._max) !== 1
-  }
+  },
 }
 
 const enumMixin = {
@@ -241,7 +242,7 @@ const enumMixin = {
       validator: this._validateEnum.bind(this),
       message:
         message ||
-        ((data) => `expected a data value at ${this._enum}, but got a ${data}`)
+        ((data) => `expected a data value at ${this._enum}, but got a ${data}`),
     })
 
     return this
@@ -250,7 +251,7 @@ const enumMixin = {
     if (this._enum === undefined) return
 
     return this._enum.includes(data)
-  }
+  },
 }
 
 const patternMixin = {
@@ -264,7 +265,7 @@ const patternMixin = {
       validator: this._validatePattern.bind(this),
       message:
         message ||
-        `expected a data match pattern: /${this._pattern.source}/${this._pattern.flags}`
+        `expected a data match pattern: /${this._pattern.source}/${this._pattern.flags}`,
     })
 
     return this
@@ -274,18 +275,118 @@ const patternMixin = {
     if (!['String', 'Number'].includes(this._type)) return
 
     return this._pattern.test(data)
-  }
+  },
 }
 
-function useMixin(target, mixin) {
-  for (const key in mixin) {
-    target[key] = mixin[key]
-    // if (key.indexOf('_') === -1) {
-    //   target[key] = mixin[key]
-    // } else {
-    //   defineUnEnumerableProperty(target, key, mixin[key])
-    // }
-  }
+const numberMixin = {
+  // transform
+  parseInt() {
+    return this.transform(parseInt)
+  },
+  parseFloat() {
+    return this.transform(parseFloat)
+  },
+  convert() {
+    return this.transform((val) => Number(val))
+  },
+  // validate
+  positive() {
+    return this.addValidator({
+      name: 'numberPositive',
+      validator: (val) => val > 0,
+      message: 'the value must be greater than 0',
+    })
+  },
+  negative() {
+    return this.addValidator({
+      name: 'numberNegative',
+      validator: (val) => val < 0,
+      message: 'the value must be less than 0',
+    })
+  },
+}
+
+const stringMixin = {
+  // transform
+  convert() {
+    return this.transform((val) => String(val))
+  },
+  lowerCase() {
+    return this.transform((val) => String(val).toLowerCase())
+  },
+  upperCase() {
+    return this.transform((val) => String(val).toUpperCase())
+  },
+  trim() {
+    return this.transform((val) => String(val).trim())
+  },
+  trimLeft() {
+    return this.transform((val) => String(val).trimLeft())
+  },
+  trimRight() {
+    return this.transform((val) => String(val).trimRight())
+  },
+  normalize() {
+    return this.transform((val) => String(val).trim().toLowerCase())
+  },
+  // validate
+  numeric() {
+    return this.pattern(
+      /^-?[0-9]\d*(\.\d+)?$/,
+      'the value must be an numeric string'
+    )
+  },
+  alpha() {
+    return this.pattern(/^[a-zA-Z]+$/, 'the value must be an alphabetic string')
+  },
+  alphaNumeric() {
+    return this.pattern(
+      /^[a-zA-Z0-9]+$/,
+      'the value must be an alphanumeric string'
+    )
+  },
+  hex() {
+    return this.pattern(/^[0-9a-fA-F]+$/, 'the value must be an hex string')
+  },
+  base64() {
+    return this.pattern(
+      /^(?:[A-Za-z0-9+\\/]{4})*(?:[A-Za-z0-9+\\/]{2}==|[A-Za-z0-9+/]{3}=)?$/,
+      'the value must be an base64 string.'
+    )
+  },
+  contain(str) {
+    assert(str, 'String')
+
+    return this.addValidator({
+      name: 'stringContain',
+      validator: (val) => val.indexOf(str) !== -1,
+      message: `the value must contain ${str}`,
+    })
+  },
+}
+
+const booleanMixin = {
+  convert() {
+    return this.transform((val) => !!val)
+  },
+}
+
+const dateMixin = {
+  convert() {
+    return this.transform((val) => {
+      if (isDate(val)) return val
+
+      const d = new Date(val)
+
+      if (!isDate(d)) {
+        return new ValidateError({
+          message: `date convert error: ${val} can not convert to a valid Date`,
+        })
+      }
+
+      return d
+    })
+  },
 }
 
 module.exports = {
@@ -295,5 +396,8 @@ module.exports = {
   dateRangeMixin,
   numberRangeMixin,
 
-  useMixin
+  stringMixin,
+  numberMixin,
+  dateMixin,
+  booleanMixin,
 }
