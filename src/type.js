@@ -27,16 +27,12 @@ for (const item of allTypes) {
 }
 
 function defineType(alias, t) {
-  if (alias in type) {
-    throw new Error(`${alias} is defined, please check`)
-  }
-
   type[alias] = typeof t === 'function' ? t : () => t.clone()
 
   return type[alias]
 }
 
 // add a alias for function
-type.func = type.function
+defineType('func', type.function)
 
 module.exports = type
