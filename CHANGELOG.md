@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/aim-leo/tegund/compare/v2.3.3...v2.4.0) (2021-03-23)
+
+
+### Features
+
+* add tranform method ([2563887](https://github.com/aim-leo/tegund/commit/2563887d2472a4e5898a5757e9afcb349e5b4dd4))
+
 ### [2.3.3](https://github.com/aim-leo/tegund/compare/v2.3.2...v2.3.3) (2021-03-23)
 
 ### [2.3.2](https://github.com/aim-leo/tegund/compare/v2.3.1...v2.3.2) (2021-03-23)
