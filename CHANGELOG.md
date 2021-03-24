@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/aim-leo/tegund/compare/v2.4.0...v2.5.0) (2021-03-24)
+
+
+### Features
+
+* add id type ([82bb1c1](https://github.com/aim-leo/tegund/commit/82bb1c1f9dced70e5d97e49360ce749f8054cf3c))
+
 ## [2.4.0](https://github.com/aim-leo/tegund/compare/v2.3.3...v2.4.0) (2021-03-23)
 
 
