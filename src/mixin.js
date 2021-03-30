@@ -256,7 +256,7 @@ const enumMixin = {
 
 const patternMixin = {
   pattern(reg, message) {
-    assert(reg, 'Pattern', 'pattern expected a reg')
+    assert(reg, 'RegExp', 'regexp expected a pattern')
 
     this._pattern = reg
 
