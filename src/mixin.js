@@ -354,13 +354,14 @@ const stringMixin = {
       'the value must be an base64 string.'
     )
   },
-  contain(str) {
+  contain(str, message) {
     assert(str, 'String')
+    assert(message, 'String')
 
     return this.addValidator({
       name: 'stringContain',
       validator: (val) => val.indexOf(str) !== -1,
-      message: `the value must contain ${str}`,
+      message: message || `the value must contain ${str}`,
     })
   },
 }

@@ -1,4 +1,5 @@
 const path = require('path')
+const CompressionPlugin = require('compression-webpack-plugin')
 
 const conf = {
   entry: './src/index.js',
@@ -18,7 +19,13 @@ const conf = {
         loader: 'babel-loader'
       }
     ]
-  }
+  },
+  plugins: [
+    new CompressionPlugin({
+      algorithm: 'gzip',
+      test: new RegExp('\\.(js)$')
+    })
+  ]
 }
 
 module.exports = conf

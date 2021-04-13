@@ -35,6 +35,9 @@ function defineType(alias, t) {
 // add a alias for function
 defineType('func', type.function)
 
+// add a alias for undefined
+defineType('undef', type.undefined)
+
 // mongodb objectid
 // not a strict validator, you can replace it by mongoose.Types.ObjectId.isValid
 defineType('id', () => type.string().clone().convert().addValidator({

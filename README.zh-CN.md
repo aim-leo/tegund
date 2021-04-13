@@ -4,36 +4,36 @@
 
 
 <h3 align="center" style="text-align: center">
-  Simple and easy-to-use JavaScript type verification tool
+  简单易用的javascript类型校验工具
 </h3>
 
 <br/>
 <br/>
 <br/>
 
-Simplified Chinese | [English](./README.md)
+简体中文 | [English](./README.md)
 
-## Introduction
+## 简介
 
-**tegund** is a very simple and intuitive JavaScript type checking library. Features overview:
+**tegund**是一个非常简单直观的javascript类型检验库。特点概述:
 
-* **Small size**: The complete size is only 4.9kb (after gzip compression), and does not rely on other third-party libraries;
-* **Rich types**: Provide dozens of basic types;
-* **Easy to expand**: Allows you to differentiate new types from basic types;
+*   **体积小** : 完整的大小只有4.9kb (gzip压缩后)，不依赖其他第三方库；
+*   **类型丰富** : 提供数十种基本类型；
+*   **易扩展** : 允许您在基本类型中分化出新的类型；
 
 ***
 
-## Example
-Basic use
+## 示例
+基本使用
 ```javascript
-const {object, string, number, integer, date, array} = require('tegund')
+const { object, string, number, integer, date, array } = require('tegund')
 
 // basic type check
 string().check('abc') // true
 number().check(true) // false
 
 // addtional condition
-string().min(5).check('abc') // false
+string().min(5).check('abc')  // false
 
 // object
 object().check({}) // true
@@ -42,14 +42,14 @@ object().check([]) // false
 // group
 const group = object({
   name: string(),
-  age:'integer' // use alias, equal to integer()
+  age: 'integer'  // use alias, equal to integer()
 })
 
 group.check({}) // false
-group.check({ name:'leo', age: 18 }) // true
+group.check({ name: 'leo', age: 18 }) // true
 
 // array
-array().check([1,'abc', true]) true
+array().check([1, 'abc', true]) true
 
 // typed array
 array(string()).check(['abc', 1]) // false
@@ -57,25 +57,25 @@ array(string()).check(['abc', 1]) // false
 array('string').check(['abc', 1]) // false
 
 // a array containe string or number
-array('string','number').check(['abc', 1]) // true
+array('string', 'number').check(['abc', 1]) // true
 
 ```
-Below we use tegund to verify more complex scenarios.
-Suppose we want to create a user table and use tegund to verify the input:
+下面我们用tegund校验更加复杂的场景。
+假设我们要创建一张用户表，使用tegund来校验输入的内容：
 
 ```javascript
-const {object, string, integer, date, array} = require('tegund')
+const { object, string, integer, date, array } = require('tegund')
 
 const interface = object({
-  name: string().min(2).max(10), // the user name must be a string and at 2-10
-  age: integer().positive(), // age must be a positive integer number
-  address: object({ // the address is a object
-    province: string(),
-    city:'string', // use alias, it is same at string()
-    county:'string',
-    addressDetail:'string',
+  name: string().min(2).max(10),  // the user name must be a string and at 2-10
+  age: integer().positive(),  // age must be a positive integer number
+  address: object({  // the address is a object
+	province: string(),
+	city: 'string',  // use alias, it is same at string()
+	county: 'string',
+	addressDetail: 'string',
   }),
-  email: string().pattern( // you can add addtional pattern and error message
+  email: string().pattern(  // you can add addtional pattern and error message
     /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
     'Please enter a correct email address'
   ),
@@ -83,9 +83,9 @@ const interface = object({
     /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/,
     'Please enter a password with more than 8 digits, including numbers and letters'
   ),
-  tag: array('string'), // tag must be a array<string>
-  remark: string().optional(), // this field is optional
-  createTime: date().forbid(), // can not provide a createTime prop
+  tag: array('string'),  // tag must be a array<string>
+  remark: string().optional(),  // this field is optional
+  createTime: date().forbid(),  // can not provide a createTime prop
   updateTime: date().forbid(),
 })
 
@@ -100,7 +100,7 @@ const passed = interface.check(args)
 // if not pass, will throw a error
 interface.assert(args)
 ```
-Error message:
+错误信息：
 ```javascript
 >>>>> interface.assert()
 <<<<< ValidateError: None is not a Object type
@@ -108,23 +108,25 @@ Error message:
 >>>>> interface.assert({})
 <<<<< ValidateError: field name validate error, expected a String type, got a [object Undefined]
 
->>>>> interface.assert({name:''})
+>>>>> interface.assert({name: ''})
 <<<<< ValidateError: field name validate error, expected a String, length gte than 2, but got a length: 0
 
->>>>> interface.assert({name:'leo'})
+>>>>> interface.assert({name: 'leo'})
 <<<<< ValidateError: field age validate error, expected a Integer type, got a [object Undefined]
 
 // and so on...
 ```
 
-For detailed usage, please check the [Document](https://aim-leo.github.io/tegund/)
+详细的使用方法，请查看[说明文档](https://aim-leo.github.io/tegund/README.zh-CN.html) 
 
-## Installation and use
+## 安装使用
 
 ```bash
-# Install tegund
+# 安装 tegund
 npm i tegund
 ```
+
+
 ## License
 
 [MIT](https://github.com/aim-leo/tegund/blob/master/LICENSE)
