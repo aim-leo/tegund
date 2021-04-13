@@ -11,7 +11,7 @@
 <br/>
 <br/>
 
-Simplified Chinese | [English](./README.md)
+English | [简体中文](./README.zh-CN.md)
 
 ## Introduction
 
