@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.3](https://github.com/aim-leo/tegund/compare/v2.5.2...v2.5.3) (2022-05-19)
+
+
+### Bug Fixes
+
+* null and undefind was not exported ([3c6baa4](https://github.com/aim-leo/tegund/commit/3c6baa4f013b56552dd12b05013f1eff33c200ae))
+
 ### [2.5.2](https://github.com/aim-leo/tegund/compare/v2.5.1...v2.5.2) (2021-04-13)
 
 ### [2.5.1](https://github.com/aim-leo/tegund/compare/v2.5.0...v2.5.1) (2021-03-30)
