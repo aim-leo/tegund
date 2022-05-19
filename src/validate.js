@@ -78,11 +78,11 @@ function isSyncFunction(...objs) {
 }
 
 function isAsyncFunction(...objs) {
-  return objs.every((obj) => isType(obj, async() => {}))
+  return objs.every((obj) => isType(obj, async () => {}))
 }
 
 function isFunction(...objs) {
-  return objs.every((obj) => inType(obj, [() => {}, async() => {}]))
+  return objs.every((obj) => inType(obj, [() => {}, async () => {}]))
 }
 
 function isDate(...objs) {
@@ -91,6 +91,10 @@ function isDate(...objs) {
 
 function isSet(...objs) {
   return objs.every((obj) => isType(obj, new Set()))
+}
+
+function isNil(...objs) {
+  return objs.every((obj) => obj === undefined || obj === null)
 }
 
 function isEmpty(...objs) {
@@ -117,10 +121,12 @@ const baseTypes = [
   'SyncFunction',
   'AsyncFunction',
   'Date',
-  'Set'
+  'Set',
+  'Null',
+  'Undefined'
 ]
 
-const sugerTypes = ['Float', 'Integer', 'Empty']
+const sugerTypes = ['Float', 'Integer', 'Empty', 'Nil']
 
 const stuctTypes = ['Object', 'Array']
 
@@ -145,7 +151,8 @@ const allValidates = {
   isRegExp,
   isDate,
   isSet,
-  isEmpty
+  isEmpty,
+  isNil
 }
 
 function getValidateByType(type) {
@@ -219,5 +226,5 @@ module.exports = {
   getValidateByType,
   getValidateType,
 
-  assert
+  assert,
 }

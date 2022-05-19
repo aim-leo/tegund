@@ -356,7 +356,7 @@ const stringMixin = {
   },
   contain(str, message) {
     assert(str, 'String')
-    assert(message, 'String')
+    assert(message, ['String', 'Nil'])
 
     return this.addValidator({
       name: 'stringContain',

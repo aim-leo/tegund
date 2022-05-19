@@ -1,45 +1,44 @@
-const { string } = require('../src/type')
+const type = require('../src/type')
 
-test(`test string numeric`, () => {
-  const val = 'abc'
-  expect(string().check(val)).toBe(true)
-  expect(string().numeric().check(val)).toBe(false)
+test(`test null type`, () => {
+  expect(type.null().check('123')).toBe(false)
+  expect(type.null().check()).toBe(false)
+  expect(type.null().check(null)).toBe(true)
+
+  expect(type.nu().check(null)).toBe(true)
+
+  expect(type.at('null').check('123')).toBe(false)
+  expect(type.at('null').check()).toBe(false)
+  expect(type.at('null').check(null)).toBe(true)
+
+  expect(type.at('nu').check(null)).toBe(true)
 })
 
-test(`test string alpha`, () => {
-  const val = '121abc'
-  expect(string().check(val)).toBe(true)
-  expect(string().alpha().check(val)).toBe(false)
+test(`test undefined type`, () => {
+  expect(type.undefined().check('123')).toBe(false)
+  expect(type.undefined().check()).toBe(false)
+  expect(type.undefined().check(null)).toBe(false)
+  expect(type.undefined().check(undefined)).toBe(true)
+
+  expect(type.undef().check(undefined)).toBe(true)
+
+
+  expect(type.at('undefined').check('123')).toBe(false)
+  expect(type.at('undefined').check()).toBe(false)
+  expect(type.at('undefined').check(null)).toBe(false)
+  expect(type.at('undefined').check(undefined)).toBe(true)
+
+  expect(type.at('undef').check(undefined)).toBe(true)
 })
 
-test(`test string alphaNumeric`, () => {
-  const val = '121abc-'
-  expect(string().check(val)).toBe(true)
-  expect(string().alphaNumeric().check(val)).toBe(false)
-})
+test(`test nil type`, () => {
+  expect(type.nil().check('123')).toBe(false)
+  expect(type.nil().check()).toBe(false)
+  expect(type.nil().check(null)).toBe(true)
+  expect(type.nil().check(undefined)).toBe(true)
 
-test(`test string hex`, () => {
-  expect(string().hex().check('FFFFFF')).toBe(true)
-  expect(string().hex().check('333333')).toBe(true)
-  expect(string().hex().check('GGGGGG')).toBe(false)
-})
-
-test(`test string base64`, () => {
-  expect(string().base64().check('1342234')).toBe(false)
-  expect(string().base64().check('afQ$%rfew')).toBe(false)
-  expect(string().base64().check('dfasdfr342')).toBe(false)
-  expect(string().base64().check('uuLMhh')).toBe(false)
-
-  expect(string().base64().check('uuLMhh==')).toBe(true)
-})
-
-test(`test string contain`, () => {
-  expect(string().contain('a').check('1342234')).toBe(false)
-  expect(string().contain('a').check('afQ$%rfew')).toBe(true)
-  expect(string().contain('2234').check('1342234')).toBe(true)
-})
-
-test(`test string convert`, () => {
-  expect(string().check(123)).toBe(false)
-  expect(string().convert().check(123)).toBe(true)
+  expect(type.at('nil').check('123')).toBe(false)
+  expect(type.at('nil').check()).toBe(false)
+  expect(type.at('nil').check(null)).toBe(true)
+  expect(type.at('nil').check(undefined)).toBe(true)
 })
